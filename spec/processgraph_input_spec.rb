@@ -7,7 +7,7 @@ require_relative 'spec_helper'
 
 describe "testing input only to process graph" do
 
-  theGraph = ProcessList.new("testfile.ss", nil)
+  theGraph = ProcessList.new("testfile", nil)
   theGraph.processData("testfile", nil, "test domain")
 
   it "created given input file [testfile]" do
@@ -21,4 +21,3 @@ describe "testing input only to process graph" do
      expect(File).to exist("testfile.png")
   end
 end
-

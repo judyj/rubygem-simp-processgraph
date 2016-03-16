@@ -1,4 +1,32 @@
 #!/usr/bin/env ruby
+
+######################################
+# simp-processgraph
+# This code allows you to plot the communications between your host and others.
+#
+# It uses the `ss` (socket statistics) command with the `-npatuw` options
+# -n, --numeric    Do now try to resolve service names.
+# -a, --all    Display all sockets.
+# -p, --processes    Show process using socket.
+# -t, --tcp    Display only TCP sockets.
+# -u, --udp    Display only UDP sockets.
+# -w, --raw    Display only RAW sockets.
+#
+# In order to run, you must set up your environment as described in https://simp-project.atlassian.net/wiki/display/SD/Setting+up+your+build+environment
+# (until you install bundler)
+# then
+# `$bundle`
+#
+# In order to create the .png files, you must have graphviz installed
+# sudo yum install graphviz
+# ...and the ruby add-on to graphviz
+#
+# sudo yum install graphviz-ruby
+#
+# ...and to ensure you can see the Ruby libraries, type (and/or add to your .bashrc) :
+# export RUBYLIB=/usr/lib64/graphviz/ruby
+#
+###########################################
 require 'optparse'
 require 'gv'
 require 'socket'
@@ -32,7 +60,7 @@ class ProcessList
     end
     if File.directory?@inputfile then
       @filetype = 'dir'
-    elsif File.file?@inputfile
+    elsif ( (File.file?@inputfile) && (File.extname(@inputfile) == ".ss") )
       @filetype = 'file'
     else
      infile = @inputfile
@@ -66,9 +94,6 @@ class ProcessList
         destProc = destIP.addProc(record[""])
         destPort = destProc.addPort(record["peerPort"])
         newPort.addConnection(destPort)
-        puts "added connection end #{record["hostname"]} #{record["peerIP"]} #{record["peerPort"]}"
-      else
-        puts "no connection end #{record["hostname"]} #{record["peerIP"]} #{record["peerPort"]}"
       end
     end
 
@@ -99,7 +124,6 @@ class ProcessList
   end
  
   def printSites()
-    puts "printSites -- printing list of #{@mySiteList.size}"
     @mySiteList.each do |sitenm|
       puts "site name is #{sitenm.getSiteName}"
       sitenm.printHosts
@@ -249,6 +273,7 @@ class SiteName
 
   def printHosts
     @myHostList.each do |hostnm|
+      puts "hostname is #{hostnm}"
       hostnm.printIPs
     end # site
   end #printHosts
@@ -293,7 +318,7 @@ class HostName
 
   def printIPs
     @myIPList.each do |ipnm|
-      puts "iplist -- name is #{ipnm.getIP}"
+      puts "ip is #{ipnm.getIP}"
       ipnm.printProcs
     end # IP
   end #printIPs
@@ -338,7 +363,7 @@ class IPAddr
 
   def printProcs
     @myProcList.each do |procnm|
-      puts "proc list -- name is #{procnm.getProc}"
+      puts "proc is #{procnm.getProc}"
       procnm.printPorts
     end # Proc
   end #printProcs
@@ -383,7 +408,7 @@ class ProcessName
 
   def printPorts
     @myPortList.each do |portno|
-      puts "port list -- name is #{portno.getPort}"
+      puts "port is #{portno.getPort}"
     end # Ports
   end #printPorts
 
@@ -429,7 +454,6 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
   @filetype = filetype
   @mysitename = mySitename
 
-  puts "filetype is #{@filetype}, infile is #{@inputfile}, outputfile is #{@outputfile}, mysitename is #{@mySitename}"
   # this ss command lists processes to a file
   # comment out for a test file
   if @filetype == 'none'
@@ -484,7 +508,6 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
         recQ = f1[2]
         if (recQ == "Recv-Q") then
           cancel = true
-          puts "empty - line was #{line}"
         end        
         sendQ = f1[3]
         localAdd = f1[4]
@@ -499,7 +522,6 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
         localPort = f2[1]
         if (localIP == '' && localPort == '') then
           cancel = true
-          puts "empty - line was #{line}"
         end
 #       for the dest address split address and proc via colon
         f3 = peerAdd.split(':')
@@ -526,7 +548,7 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
         sitename = @mysitename
       end
       hostname = "#{Socket.gethostname}"
-      domainname = ""
+      domainname = ''
   
 #     write both sets to hashes
 #    ignore header line
@@ -537,14 +559,22 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
         $datarow["domainname"] = domainname
         $datarow["localIP"] = localIP
         $datarow["localPort"] = localPort
-        $datarow["procname"] = "#{procName}\n#{pUser}"
+        if (procName != nil && pUser != nil) then
+          $datarow["procname"] = "#{procName}\n#{pUser}"
+        elsif (procName != nil) then
+          $datarow["procname"] = procName
+        elsif (pUser != nil)
+          $datarow["procname"] = pUser
+        else
+          $datarow["procname"] = nil
+        end  
         $datarow["processName"] = procName
         $datarow["puser"] = pUser.strip
         $datarow["peerIP"] = peerIP
         $datarow["peerPort"] = peerPort
         $datarow["socketUsers"] = socketUsers
         @allComms << $datarow
-      end # useful line      
+      end # useful line
     end   # end reading file
     printArray(@allComms, inputfile)
   else # not new file
@@ -582,7 +612,7 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
           puts "badly formatted file, ignoring line #{line}"
         else
           hostname = "#{Socket.gethostname}"
-          domainname = "domain"
+          domainname = ''
 #         write both sets to hashes
           $datarow = Hash.new
           $datarow["sitename"] = sitename
@@ -590,8 +620,16 @@ def FileInput(inputfile, outputfile, filetype, mySitename)
           $datarow["domainname"] = domainname
           $datarow["localIP"] = localIP
           $datarow["localPort"] = localPort
+        if (procName != nil && pUser != nil) then
           $datarow["procname"] = "#{procName}\n#{pUser}"
-          $datarow["processName"] = procName
+        elsif (procName != nil) then
+          $datarow["procname"] = procName
+        elsif (pUser != nil)
+          $datarow["procname"] = pUser
+        else
+          $datarow["procname"] = nil
+        end  
+         $datarow["processName"] = procName
           $datarow["puser"] = pUser
           $datarow["peerIP"] = peerIP
           $datarow["peerPort"] = peerPort
@@ -612,7 +650,7 @@ def printArray(allComms, inputFile)
   outfile = File.open(outFile, 'w')
   allComms.each do |record|
 #    if ((record["peerPort"] != "*") && (record["peerPort"] != "Port"))
-      outfile.puts "#{record["sitename"]}, #{record["hostname"]}, #{record["domainname"]}, #{record["localIP"]},#{record["localPort"]}, #{record["processName"]}, #{record["puser"]}, #{record["peerIP"]}, #{record["peerPort"]}"
+      outfile.puts "#{record["sitename"]},#{record["hostname"]},#{record["domainname"]},#{record["localIP"]},#{record["localPort"]},#{record["processName"]},#{record["puser"]},#{record["peerIP"]},#{record["peerPort"]}"
 #    end
   end
 end #printArray
@@ -656,4 +694,3 @@ theGraph = ProcessList.new($inpfile, $outfile)
 theGraph.processData($inpfile, $outfile, $mysitename)
 
 end # running this file or just required
-
