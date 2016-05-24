@@ -41,10 +41,11 @@ class ProcessList
   end
 
 # Process array from file
-  def process_data(site_name)
+  def process_data(site_name, con_type)
     @inputfile = @infile
     @outputfile = @outfile
     @site_name = site_name
+    @con_type = con_type
 
   # get the list of processes to a file
     infile = 'process_list'
@@ -81,7 +82,7 @@ class ProcessList
 #   set up objects based on the record you just read
     data_read.each do |record|
       new_site = the_start.add_site(record["site_name"])
-      new_host = new_site.addHost(record["hostname"])
+      new_host = new_site.add_host(record["hostname"])
       new_ip = new_host.add_ip(record["local_ip"])
       new_proc = new_ip.add_proc(record["proc_name"])
       new_port = new_proc.add_port(record["local_port"])
@@ -90,20 +91,22 @@ class ProcessList
 #      dest_site = the_start.add_site(record["site_name"])
       if ( (record["peer_ip"]!= "*") && (record["peer_port"]!= "*"))
         dest_site = the_start.add_site("")
-        dest_host = dest_site.addHost("")
+        dest_host = dest_site.add_host("")
         dest_ip = dest_host.add_ip(record["peer_ip"])
-        dest_proc = dest_ip.add_proc(record[""])
+        dest_proc = dest_ip.add_proc("")
         dest_port = dest_proc.add_port(record["peer_port"])
         new_port.add_connection(dest_port)
+        new_proc.add_connection(dest_proc)
+        new_ip.add_connection(dest_ip)
       end
     end
 
     # Graph the things
     gv = Gv.digraph("ProcessGraph")
     # Nodes
-    the_start.graph_processes(gv, @outputfile)
+    the_start.graph_processes(gv, @outputfile, @con_type)
     # Connectors
-    the_start.graph_connections(gv, @outputfile)
+    the_start.graph_connections(gv, @outputfile, @con_type)
   end #process_data
 
   def add_site(site)
@@ -131,7 +134,7 @@ class ProcessList
     end # site
   end #printSites
 
-  def graph_processes(gv, outfile)
+  def graph_processes(gv, outfile, con_type)
     outputfile = outfile
     # rank TB makes the graph go from top to bottom - works better right now with the CentOS version
     # rank LR draws left to right which is easier to read
@@ -167,34 +170,57 @@ class ProcessList
           Gv.setv(sgc, 'color', 'blue')
           Gv.setv(sgc, 'label', "#{ip.ip}")
           Gv.setv(sgc, 'shape', 'box')
+          nga = Gv.node(sgc,"k#{upno}")
+          Gv.setv(nga, 'label', "#{ip.ip}")
+          Gv.setv(nga, 'style', 'filled')
+          Gv.setv(nga, 'shape', 'point')
+          Gv.setv(nga, 'color', 'white')
+          Gv.setv(nga, 'width', '0.01')
+          ip.graph_node = "k#{upno}"
           upno +=1
-          ip.proc_list.each do |_proc|
-            proccount += 1
-            sgd = Gv.graph(sgc, "cluster#{upno}")
-            Gv.setv(sgd, 'color', 'green')
-            Gv.setv(sgd, 'label', "#{_proc.proc_name}")
-            Gv.setv(sgd, 'shape', 'box')
-            upno +=1
-            _proc.port_list.each do |portno|
-              portcount += 1
-              sge = Gv.graph(sgd, "cluster#{upno}")
-              Gv.setv(sge, 'color', 'black')
-              Gv.setv(sge, 'label', "#{portno.port}")
-              Gv.setv(sge, 'shape', 'box')
-              ng = Gv.node(sge,"k#{portcount}")
-              Gv.setv(ng, 'label', "#{portno.port}")
-              Gv.setv(ng, 'style', 'filled')
-              Gv.setv(ng, 'shape', 'point')
-              portno.graph_node = "k#{portcount}"
+          if (con_type < 2)
+            ip.proc_list.each do |_proc|
+              proccount += 1
+              sgd = Gv.graph(sgc, "cluster#{proccount}")
+              Gv.setv(sgd, 'color', 'green')
+              Gv.setv(sgd, 'label', "#{_proc.proc_name}")
+              Gv.setv(sgd, 'shape', 'box')
+              ngb = Gv.node(sgd,"k#{upno}")
+              Gv.setv(ngb, 'label', "#{_proc.proc_name}")
+              Gv.setv(ngb, 'style', 'filled')
+              Gv.setv(ngb, 'shape', 'point')
+              Gv.setv(ngb, 'color', 'white')
+              Gv.setv(ngb, 'width', '0.01')
+              _proc.graph_node = "k#{upno}"
               upno +=1
-            end #ports
-          end #proc_list
+              if (con_type < 1)
+                _proc.port_list.each do |portno|
+                  portcount += 1
+                  sge = Gv.graph(sgd, "cluster#{portcount}")
+                  Gv.setv(sge, 'color', 'black')
+                  Gv.setv(sge, 'label', "#{portno.port}")
+                  Gv.setv(sge, 'shape', 'box')
+                  ngc = Gv.node(sge,"k#{upno}")
+                  Gv.setv(ngc, 'label', "#{portno.port}")
+                  Gv.setv(ngc, 'style', 'filled')
+                  Gv.setv(ngc, 'shape', 'point')
+                  Gv.setv(ngc, 'color', 'white')
+                  Gv.setv(ngc, 'width', '0.01')
+                  portno.graph_node = "k#{upno}"
+                  upno +=1
+                end #ports
+              end # if port
+            end #proc_list
+          end #if proc or port
         end #ip_list
       end #host_list
     end # site
   end #graph_processes
 
-  def graph_connections (gv, outfile)
+  def graph_connections (gv, outfile, con_type)
+#   con_type = 0 # port [T]
+#   con_type = 1 # process [R]
+#   con_type = 2 # ip [I]
     colors = Array['yellow','green','orange','violet', 'turquoise', 'gray','brown']
     count = 0
     outputfile = outfile
@@ -204,23 +230,59 @@ class ProcessList
       host_list.each do |host|
         ip_list = host.ip_list
         ip_list.each do |ip|
+
+#       ip connections
+          if (con_type == 2)
+            ip.connections.each do |conn|
+              start_node = ip.graph_node
+              end_node = conn.graph_node
+              if (end_node != nil && start_node != nil) then
+                count += 1
+                colorcode =  count.modulo(colors.size)
+                eg = Gv.edge(gv, start_node, end_node)
+#               connect the dots
+                Gv.setv(eg, 'color', colors[colorcode])
+              end  # not nil
+            end #connections
+          end # if ip connections
+
           proc_list = ip.proc_list
           proc_list.each do |myproc|
-            port_list = myproc.port_list
-            port_list.each do |portnum|
-#             once more to get connections
-              portnum.connections.each do |conn|
-                startNode = portnum.graph_node
-                endNode = conn.graph_node
-                if (endNode != nil && startNode != nil)
-                  count += 1
-                  colorcode =  count.modulo(colors.size)
-                  eg = Gv.edge(gv, startNode, endNode)
-#                 connect the dots
-                  Gv.setv(eg, 'color', colors[colorcode])
-                end  # not nil
+
+# processes
+            if (con_type == 1)
+              myproc.connections.each do |conn|
+               start_node = myproc.graph_node
+               end_node = conn.graph_node
+               if (end_node != nil && start_node != nil) then
+                 count += 1
+                 colorcode =  count.modulo(colors.size)
+                 eg = Gv.edge(gv, start_node, end_node)
+#                connect the dots
+                 Gv.setv(eg, 'color', colors[colorcode])
+              end  # not nil
               end #connections
-            end #ports
+            end # if process connections
+
+
+            port_list = myproc.port_list
+#           port connections
+            if (con_type == 0)
+              port_list.each do |portnum|
+#               once more to get connections
+                portnum.connections.each do |conn|
+                  start_node = portnum.graph_node
+                  end_node = conn.graph_node
+                  if (end_node != nil && start_node != nil)
+                    count += 1
+                    colorcode =  count.modulo(colors.size)
+                    eg = Gv.edge(gv, start_node, end_node)
+#                   connect the dots
+                    Gv.setv(eg, 'color', colors[colorcode])
+                  end  # not nil
+                end #connections
+              end #ports
+            end # if port connections
           end #proc_list
         end #ip_list
       end #host_list
@@ -240,7 +302,7 @@ class SiteName
     @host_list = []
   end #initialize
 
-  def addHost(new_host)
+  def add_host(new_host)
     found = false
     if (@host_list.size > 0)
       @host_list.each do |hostnm|
@@ -305,11 +367,14 @@ end #HostName
 
 ### IP
 class IPAddr
-  attr_reader :ip, :proc_list
+  attr_accessor :graph_node
+  attr_reader :ip, :proc_list, :connections
 
   def initialize(ip)
     @ip = ip
+    @connections = []
     @proc_list = []
+    @graph_node = nil
   end #initialize
 
   def add_proc(proc_to_add)
@@ -337,15 +402,21 @@ class IPAddr
     end # Proc
   end #print_proc_list
 
+  def add_connection(ip)
+    @connections << ip
+  end
+
 end #IPAddr
 
 ### Process
 class ProcessName
-  attr_accessor :proc_name, :port_list
+  attr_accessor :proc_name, :port_list, :graph_node
+  attr_reader :connections
 
   def initialize(proc_name)
     @proc_name = proc_name
     @proc_name.strip! if @proc_name
+    @connections = []
     @port_list = []
   end #initialize
 
@@ -372,6 +443,10 @@ class ProcessName
       puts "port is #{port.port}"
     end # Ports
   end #printPorts
+
+  def add_connection(proc)
+    @connections << proc
+  end
 
 end #ProcessName
 

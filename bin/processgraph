@@ -11,6 +11,7 @@ options = {}
 infile = nil
 outfile = nil
 site_name = nil
+con_type = 0 
 optsparse = OptionParser.new do |opts|
   opts.banner = "Usage: processgraph -s sitename [options]"
   opts.on('-h', '--help', 'Help') do
@@ -25,6 +26,25 @@ optsparse = OptionParser.new do |opts|
     |i| puts "input filename is #{i}"
     infile = i.strip
   end
+  opts.on('-c', '--connection NAME', 'Connection Type (T = Port, R = Process, I = IP)') do
+    |c| puts "connection is #{c}"
+    $con = c.strip 
+#  con_type = 0 # port [T]
+#  con_type = 1 # process [R]
+#  con_type = 2 # ip [I]
+   case c
+    when "I", "i"
+      con_type = 2
+    when "R", "r"
+      con_type = 1
+    when "T", "t"
+      con_type = 0
+    else
+      puts "Invalid connection type"
+      puts "graph level option is #{con_type}"
+      exit
+    end
+  end # connection option
   out_msg =  'Outputfilename (will look for files in the directory named *.ss)'
   opts.on('-o', '--output file NAME', out_msg) do
     |o| puts "output filename is #{o}"
@@ -44,5 +64,5 @@ FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
 
 Dir.chdir(outdir) do
   the_graph = ProcessList.new(infile, outfile)
-  the_graph.process_data(site_name)
+  the_graph.process_data(site_name, con_type)
 end
