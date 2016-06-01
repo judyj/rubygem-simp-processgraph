@@ -14,7 +14,7 @@ site_name = "test_domain"
 
   Dir.chdir(outdir) do
     the_graph = ProcessList.new()
-    the_graph.process_data(site_name)
+    the_graph.process_data(site_name, 0)
   end
 
   it "created input file based on default [process_list]" do

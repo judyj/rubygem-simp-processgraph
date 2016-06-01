@@ -14,6 +14,7 @@ This code allows you to plot the communications between your host and others.
 and writes the interim data to a file,
 
 * Then it creates a graph, boxing up site, host, IP, ports, and connecting to destinations.
+You can link port-to-port (default), IP-to-IP, or process-t-process, each conglomerating the data underneath. 
 Lines are color-alternated to keep them distinct.
 
 In order to create the .png files, you must have graphviz installed
@@ -61,4 +62,6 @@ Usage: processgraph [options]
     -i, --input filename NAME        Input file or directory name, properly formatted files will have the .ss filetype, generated from an earlier run
 
     -o, --output file NAME           Output file or directory name (will look for files in the given directory and subdirectories named *.ss)
+
+    -c, --connection NAME            Connection Type (T = Port, R = Process, I = IP)
 ```

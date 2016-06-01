@@ -93,7 +93,7 @@ class ProcessList
         dest_site = the_start.add_site("")
         dest_host = dest_site.add_host("")
         dest_ip = dest_host.add_ip(record["peer_ip"])
-        dest_proc = dest_ip.add_proc("")
+        dest_proc = dest_ip.add_proc(record["peer_proc"])
         dest_port = dest_proc.add_port(record["peer_port"])
         new_port.add_connection(dest_port)
         new_proc.add_connection(dest_proc)
@@ -218,12 +218,15 @@ class ProcessList
   end #graph_processes
 
   def graph_connections (gv, outfile, con_type)
+    line_array = Array.new
+    start_end = Hash.new
 #   con_type = 0 # port [T]
 #   con_type = 1 # process [R]
 #   con_type = 2 # ip [I]
     colors = Array['yellow','green','orange','violet', 'turquoise', 'gray','brown']
     count = 0
     outputfile = outfile
+
 #   progress through the sites
     @site_list.each do |sitenm|
       host_list = sitenm.host_list
@@ -233,15 +236,14 @@ class ProcessList
 
 #       ip connections
           if (con_type == 2)
-            ip.connections.each do |conn|
+            ip.connections_i.each do |conn|
               start_node = ip.graph_node
               end_node = conn.graph_node
               if (end_node != nil && start_node != nil) then
-                count += 1
-                colorcode =  count.modulo(colors.size)
-                eg = Gv.edge(gv, start_node, end_node)
-#               connect the dots
-                Gv.setv(eg, 'color', colors[colorcode])
+                start_end = Hash.new
+                start_end["start"] = start_node
+                start_end["end"] = end_node
+                line_array << start_end
               end  # not nil
             end #connections
           end # if ip connections
@@ -251,45 +253,54 @@ class ProcessList
 
 # processes
             if (con_type == 1)
-              myproc.connections.each do |conn|
-               start_node = myproc.graph_node
-               end_node = conn.graph_node
-               if (end_node != nil && start_node != nil) then
-                 count += 1
-                 colorcode =  count.modulo(colors.size)
-                 eg = Gv.edge(gv, start_node, end_node)
-#                connect the dots
-                 Gv.setv(eg, 'color', colors[colorcode])
-              end  # not nil
+              myproc.connections_r.each do |conn|
+                start_node = myproc.graph_node
+                end_node = conn.graph_node
+                if (end_node != nil && start_node != nil) then
+                  start_end = Hash.new
+                  start_end["start"] = start_node
+                  start_end["end"] = end_node
+                  line_array << start_end
+                end  # not nil
               end #connections
             end # if process connections
 
 
             port_list = myproc.port_list
-#           port connections
             if (con_type == 0)
+#             port connections
               port_list.each do |portnum|
-#               once more to get connections
-                portnum.connections.each do |conn|
+                portnum.connections_t.each do |conn|
                   start_node = portnum.graph_node
                   end_node = conn.graph_node
                   if (end_node != nil && start_node != nil)
-                    count += 1
-                    colorcode =  count.modulo(colors.size)
-                    eg = Gv.edge(gv, start_node, end_node)
-#                   connect the dots
-                    Gv.setv(eg, 'color', colors[colorcode])
+                     start_end = Hash.new
+                     start_end["start"] = start_node
+                     start_end["end"] = end_node
+                     line_array << start_end
                   end  # not nil
                 end #connections
               end #ports
+              line_array.uniq!
             end # if port connections
           end #proc_list
         end #ip_list
       end #host_list
     end # site
-  success = Gv.write(gv, "#{outputfile}.dot")
-# for now, create the dot this way, see if we can find correction
-  %x(dot -Tpng #{outputfile}.dot -o #{outputfile}.png).strip
+
+# now just plot out the array of connections
+    line_array.each do |start_end|
+      count += 1
+      start_node = start_end["start"]
+      end_node = start_end["end"]
+      colorcode =  count.modulo(colors.size)
+      eg = Gv.edge(gv, start_node, end_node)
+#     connect the dots
+      Gv.setv(eg, 'color', colors[colorcode])
+    end
+    success = Gv.write(gv, "#{outputfile}.dot")
+#   for now, create the dot this way, see if we can find correction
+    %x(dot -Tpng #{outputfile}.dot -o #{outputfile}.png).strip
   end #graph_connections
 end #ProcessList
 
@@ -368,11 +379,11 @@ end #HostName
 ### IP
 class IPAddr
   attr_accessor :graph_node
-  attr_reader :ip, :proc_list, :connections
+  attr_reader :ip, :proc_list, :connections_i
 
   def initialize(ip)
     @ip = ip
-    @connections = []
+    @connections_i = []
     @proc_list = []
     @graph_node = nil
   end #initialize
@@ -402,8 +413,8 @@ class IPAddr
     end # Proc
   end #print_proc_list
 
-  def add_connection(ip)
-    @connections << ip
+  def add_connection(ip_add)
+     @connections_i << ip_add
   end
 
 end #IPAddr
@@ -411,12 +422,12 @@ end #IPAddr
 ### Process
 class ProcessName
   attr_accessor :proc_name, :port_list, :graph_node
-  attr_reader :connections
+  attr_reader :connections_r
 
   def initialize(proc_name)
     @proc_name = proc_name
     @proc_name.strip! if @proc_name
-    @connections = []
+    @connections_r = []
     @port_list = []
   end #initialize
 
@@ -445,7 +456,7 @@ class ProcessName
   end #printPorts
 
   def add_connection(proc)
-    @connections << proc
+    @connections_r << proc
   end
 
 end #ProcessName
@@ -453,16 +464,16 @@ end #ProcessName
 ### PortNum
 class PortNum
   attr_accessor :graph_node
-  attr_reader :port, :connections
+  attr_reader :port, :connections_t
 
   def initialize(port)
     @port = port
-    @connections = []
+    @connections_t = []
     @graph_node
   end #initialize
 
   def add_connection(port)
-    @connections << port
+    @connections_t << port
   end
 end #PortNum
 
@@ -569,6 +580,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
       end
       hostname = "#{Socket.gethostname}"
       domainname = ''
+      peer_proc = ''
 
 #     write both sets to hashes
 #    ignore header line
@@ -591,6 +603,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
         datarow["process_name"] = proc_name
         datarow["process_user"] = proc_user.strip
         datarow["peer_ip"] = peer_ip
+        datarow["peer_proc"] = peer_proc
         datarow["peer_port"] = peer_port
         datarow["socket_users"] = socket_users
         @all_comms << datarow
@@ -625,6 +638,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           peer_ip = f1[7]
           peer_port = f1[8]
           socket_users = ''
+          peer_proc = ''
         rescue
 #         ignore everything else
           puts "badly formatted file, ignoring line #{line}"
@@ -651,11 +665,12 @@ def file_input(inputfile, outputfile, filetype, site_name)
         else
           datarow["proc_name"] = nil
         end
-         datarow["process_name"] = proc_name
+          datarow["process_name"] = proc_name
           datarow["process_user"] = proc_user
           datarow["peer_ip"] = peer_ip
           datarow["peer_port"] = peer_port
           datarow["socket_users"] = socket_users
+          datarow["peer_proc"] = peer_proc
           @all_comms << datarow
         end #enough fields
       end   # end reading file
@@ -670,6 +685,6 @@ def print_array(all_comms, input_file)
   outFile = "#{input_file}.ss"
   outfile = File.open(outFile, 'w')
   all_comms.each do |record|
-    outfile.puts "#{record["site_name"]},#{record["hostname"]},#{record["domainname"]},#{record["local_ip"]},#{record["local_port"]},#{record["process_name"]},#{record["process_user"]},#{record["peer_ip"]},#{record["peer_port"]}"
+    outfile.puts "#{record["site_name"]},#{record["hostname"]},#{record["domainname"]},#{record["local_ip"]},#{record["local_port"]},#{record["process_name"]},#{record["process_user"]},#{record["peer_ip"]},#{record["peer_port"]},#{record["peer_proc"]}"
   end
 end #print_array

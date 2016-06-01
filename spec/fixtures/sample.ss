@@ -1,7 +1,6 @@
 jj, localhost.localdomain, , ALL,9014, , , *, *
 jj, localhost.localdomain, , ALL,5353, , , *, *
 jj, localhost.localdomain, , ALL,46384, , , *, *
-jj, localhost.localdomain, , 127.0.0.1, , , *, *
 jj, localhost.localdomain, , *%virbr0,67, , , *, *
 jj, localhost.localdomain, , ALL,68, , , *, *
 jj, localhost.localdomain, , 127.0.0.1,323, , , *, *
