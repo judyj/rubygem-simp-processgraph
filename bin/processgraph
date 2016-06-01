@@ -51,7 +51,13 @@ optsparse = OptionParser.new do |opts|
     outfile = o.strip
   end
 end
-optsparse.parse!
+begin
+  optsparse.parse!
+rescue
+  puts "missing argument"
+  puts optsparse.banner
+  exit
+end
 
 unless site_name
   puts "Missing argument -s"

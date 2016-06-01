@@ -15,7 +15,7 @@ describe "testing input only to process graph" do
 
   Dir.chdir(outdir) do
     the_graph = ProcessList.new("testfile", nil)
-    the_graph.process_data(site_name)
+    the_graph.process_data(site_name, 0)
   end
 
   it "created given input file [testfile]" do
