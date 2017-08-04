@@ -12,9 +12,9 @@ Gem::Specification.new do |s|
   s.email       = 'simp@simp-project.org'
   s.files       = ["lib/simp-processgraph.rb"]
   s.homepage    = 'https://github.com/simp/rubygem-simp-processgraph'
-  s.metadata = {
-                 'issue_tracker' => 'https://simp-project.atlassian.net'
-               }
+#  s.metadata = {
+#                 'issue_tracker' => 'https://simp-project.atlassian.net'
+#               }
   s.executables = 'processgraph'
   s.license       = 'Apache-2.0'
 
