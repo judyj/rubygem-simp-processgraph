@@ -7,7 +7,8 @@ before_install:
   - sudo apt-get install -y graphviz libgraphviz-dev libgv-ruby
   - sudo gem install bundler
   - rm Gemfile.lock || true
-bundler_args: "--without development --path .vendor"
+#bundler_args: "--without development --path .vendor"
+bundler_args: "--path .vendor"
 notifications:
   email: false
 # graphviz libraries are compiled against system ruby  
