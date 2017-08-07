@@ -8,7 +8,6 @@ gemspec
 # mandatory gems
 gem 'bundler'
 gem 'rake'
-gem 'gv'
 
 group :system_tests do
   gem 'rspec'
