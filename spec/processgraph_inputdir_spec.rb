@@ -7,6 +7,7 @@ require_relative 'spec_helper'
 require 'fileutils'
 
 site_name = "test_domain"
+con_type = 0
 home_dir = File.expand_path('~')
 $test_dir = home_dir+'/ssfiles'
 $sample_file = 'spec/fixtures/sample.ss'
@@ -27,7 +28,7 @@ describe "testing input directory to process graph" do
 
   Dir.chdir(outdir) do
     the_graph = ProcessList.new($test_dir, "testdir")
-    the_graph.process_data(site_name)
+    the_graph.process_data(site_name, con_type)
   end
 
   it "created dot file from input directory name [testdir]" do
