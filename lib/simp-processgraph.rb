@@ -12,11 +12,6 @@
 # -u, --udp    Display only UDP sockets.
 # -w, --raw    Display only RAW sockets.
 #
-# In order to run, you must set up your environment as described in https://simp-project.atlassian.net/wiki/display/SD/Setting+up+your+build+environment
-# (until you install bundler)
-#
-# `$bundle`
-#
 # In order to create the .png files, you must have graphviz installed
 # sudo yum install graphviz
 # ...and the ruby add-on to graphviz
@@ -512,16 +507,16 @@ def file_input(inputfile, outputfile, filetype, site_name)
     @input1file = "#{@inputfile}#{@rawtype}"
     %x(ss -npatuw > #{@input1file})
     innewfiles = `pwd`.strip
-    innewfiles = "#{innewfiles}\/"
+    @inputfile = "#{innewfiles}\/"
     @filetype = 'dir'
     @raw = true
   end
   if @filetype == 'dir'
     if @raw == true
-      Dir.foreach(innewfiles) do |infile|
+      Dir.foreach(@inputfile) do |infile|
         infile = infile
         if infile.end_with?(@rawtype)
-          infiles << innewfiles+'/'+infile
+          infiles << @inputfile+'/'+infile
         end
       end    
     else
@@ -535,8 +530,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
     if infiles.size == 0
        puts "no files found"
     else
-      puts "infiles: "
-      puts infiles
+      # puts "infiles: "
+      # puts infiles
     end
     @inputfile = @inputfile+"_dir"
     if @outputfile == nil
@@ -560,7 +555,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
       justfile = p1[0]
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
-        puts "line raw #{line}"
         line.strip!
 
 #       create a hash for all the significant info
@@ -623,7 +617,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           the_pid = f7[0]
           proc_user = %x(ps --no-header -o user #{the_pid}).strip
         rescue
-#          puts "ignoring line #{line} of #{infile}"
+#         puts "ignoring line #{line} of #{infile}"
 #         ignore everything else
         end
 #       current site and host
@@ -675,7 +669,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
       counter = 0
 #     read the file, one line at a time
       IO.foreach(infile) do |line|
-        puts "line not raw #{line}"
         line.strip!
 
         begin
@@ -703,8 +696,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
           puts "error parsing - badly formatted file, ignoring line #{line}"
         end
 #       current domain and host
-        #if (f1.size < 9)
-        if (f1.size < 1)
+#        if (f1.size < 9)
+        if (f1.size < 7)
           puts "not enough fields - badly formatted file, ignoring line #{line}"
         else
           hostname = "#{Socket.gethostname}"
