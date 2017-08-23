@@ -16,10 +16,6 @@ con_type = 0
 
 optsparse = OptionParser.new do |opts|
   opts.banner = "Usage: processgraph -s sitename [options]"
-  opts.on('-h', '--help', 'Help') do
-    puts opts
-    exit
-  end
   opts.on('-s', '--site NAME', 'Site Name (required!)') do |s| 
 #    puts "site name is #{s}"
     site_name = s.strip
@@ -56,6 +52,10 @@ optsparse = OptionParser.new do |opts|
   opts.on('-o', '--output FILENAME','File name root (directory is predetermined)') do |o| 
      if $debug then puts "output filename is #{o}" end
     outfile = o.strip
+  end
+  opts.on('-h', '--help', 'Help') do
+    puts opts
+    exit 0
   end
 end # OptionParser
 

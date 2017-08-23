@@ -10,11 +10,13 @@ This code allows you to plot the communications between your host and others.
 -t, --tcp    Display only TCP sockets.
 -u, --udp    Display only UDP sockets.
 -w, --raw    Display only RAW sockets.
-* It creates an array of hashes of (sitename, hostname, domainname, localIP, localPort, process, user, peerIP, peerPort, socketUsers),
-and writes the interim data to a file,
+* It creates an array of hashes of (sitename, hostname, domainname, localIP, 
+  localPort, process, user, peerIP, peerPort, socketUsers),
+  and writes the interim data to a file,
 
-* Then it creates a graph, boxing up site, host, IP, ports, and connecting to destinations.
-Lines are color-alternated to keep them distinct.
+* Then it creates a graph, boxing up site, host, IP, ports, and 
+  connecting to destinations.
+  Lines are color-alternated to keep them distinct.
 
 In order to create the .png files, you must have graphviz installed
 ```bash
@@ -26,6 +28,7 @@ export RUBYLIB=/usr/lib64/graphviz/ruby
 ```
 
 Below are the functions available under rake:
+(use rake -T to ensure this data is up to date)
 
 ```
 rake chmod            # Ensure gemspec-safe permissions on all files
@@ -43,6 +46,7 @@ To run the program, build and install the gem by running
 
 and run it
 `$ processgraph -s [sitename]`
+`$ processgraph -h` will give you the parameter info, as well`
 
 or:
 type in the command below to run it right from the ruby:
@@ -56,9 +60,13 @@ Usage: processgraph [options]
 
     -h, --help                       Help
 
-    -s, --site  NAME                 Name to associate with your site **(REQUIRED)**
+    -s, --site  NAME                 Name to associate with your site *REQUIRED*
 
-    -i, --input filename NAME        Input file or directory name, properly formatted files will have the .ss filetype, generated from an earlier run
+    -i, --input filename NAME        Input file or directory name, properly 
+                                     formatted files will have the .ss filetype,
+                                     generated from an earlier run
 
-    -o, --output file NAME           Output file or directory name (will look for files in the given directory and subdirectories named *.ss)
+    -o, --output file NAME           Output file or directory name 
+                                     (will look for files in the given directory
+                                      and subdirectories named *.ss)
 ```

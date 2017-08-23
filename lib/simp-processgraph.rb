@@ -88,7 +88,7 @@ class ProcessList
 #     if we are on the www (firefox or chrome), let's just condense all those calls for now
       proc_name = record["proc_name"]
       port_name = record["local_port"]
-      if (proc_name == 'firefox' or proc_name == 'chrome')
+      if (proc_name[0..6] == 'firefox' or proc_name == 'chrome')
         port_name = "local"
       end
       new_proc = new_ip.add_proc(record["proc_name"])
@@ -100,7 +100,7 @@ class ProcessList
         dest_site = the_start.add_site("")
         dest_host = dest_site.add_host("")
         peer_proc = record["peer_proc"]
-        if (proc_name == 'firefox' or proc_name == 'chrome')
+        if (proc_name[0..6] == 'firefox' or proc_name == 'chrome')
           dest_ip = dest_host.add_ip("www")
           dest_proc = dest_ip.add_proc(peer_proc)
           dest_port = dest_proc.add_port("www")
