@@ -1,64 +1,103 @@
+<%- includes(:badges,'') do |badges| -%>
+<%= badges -%>
+<%- end -%>
+
 # simp-processgraph
-This holds the tool we are using to draw the process graphs
+
+A tool to draw the process graphs
+
+#### Table of Contents
+1. [Overview](#overview)
+2. [Setup](#setup)
+3. [Beginning with simp-processgraph](#beginning-with-simp-processgraph)
+4. [Environment variables](#environment-variables)
+5. [Methods](#methods)
+6. [Examples](#examples)
+7. [License](#license)
+
+## Overview
 
 This code allows you to plot the communications between your host and others.
 
 * It uses the `ss` (socket statistics) command with the `-npatuw` options
--n, --numeric    Do now try to resolve service names.
--a, --all    Display all sockets.
--p, --processes    Show process using socket.
--t, --tcp    Display only TCP sockets.
--u, --udp    Display only UDP sockets.
--w, --raw    Display only RAW sockets.
+
+-n, --numeric - Do not try to resolve service names.<br>
+-a, --all - Display all sockets.<br>
+-p, --processes - Show process using socket.<br>
+-t, --tcp - Display only TCP sockets.<br>
+-u, --udp - Display only UDP sockets.<br>
+-w, --raw - Display only RAW sockets.
+
 * It creates an array of hashes of (sitename, hostname, domainname, localIP, localPort, process, user, peerIP, peerPort, socketUsers),
 and writes the interim data to a file,
-
 * Then it creates a graph, boxing up site, host, IP, ports, and connecting to destinations.
+You can link port-to-port (default), IP-to-IP, or process-to-process, each conglomerating the data underneath. 
 Lines are color-alternated to keep them distinct.
+
+
+## Setup
 
 In order to create the .png files, you must have graphviz installed
 ```bash
 sudo yum install graphviz graphviz-devel graphviz-ruby
 ```
-...and to ensure you can see the Ruby libraries, type:
+And you must be running the system ruby to work properly with that library, so type:
+```bash
+rvm use system
+```
+if rvm is not installed, you can set it up like this:
+```bash
+$ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys \
+    409B6B1796C275462A1703113804BB82D39DC0E3
+```
+
+```bash
+$ \curl -sSL https://get.rvm.io | bash -s stable --ruby=2.1.9
+```
+
+```bash
+$ source ~/.rvm/scripts/rvm
+```
+
+## Environment variables
+
+To ensure you can see the Ruby libraries, type:
 ```bash
 export RUBYLIB=/usr/lib64/graphviz/ruby
 ```
 
-Below are the functions available under rake:
+### Beginning with simp-processgraph
 
-```
-rake chmod            # Ensure gemspec-safe permissions on all files
-rake clean            # Remove any temporary products
-rake clobber          # Remove any generated file
-rake default          # default - help
-rake help             # help
-rake pkg:gem          # build rubygem package for simp-processgraph
-rake pkg:install_gem  # build and install rubygem package for simp-processgraph
-rake spec             # run all RSpec tests
+Add this to your project's `Gemfile`:
+
+```ruby
+gem 'simp-processgraph'
 ```
 
-To run the program, build and install the gem by running
-`$ rake pkg:install_gem`
+Build and install the gem by running
+```bash
+rake pkg:install_gem
+```
+(to see other rake options, run `rake -T`)
+
+
+## Methods
+
+
+## Examples
 
 and run it
+
 `$ processgraph -s [sitename]`
 
-or:
-type in the command below to run it right from the ruby:
+The usage can be found by typing
+
+`$ processgraph --help`
+
+or, type in the command below to run it right from the ruby:
+
 `$ ruby simp-processgraph.rb`
 
-The parameters are:
 
-```
-Usage: processgraph [options]
-
-
-    -h, --help                       Help
-
-    -s, --site  NAME                 Name to associate with your site **(REQUIRED)**
-
-    -i, --input filename NAME        Input file or directory name, properly formatted files will have the .ss filetype, generated from an earlier run
-
-    -o, --output file NAME           Output file or directory name (will look for files in the given directory and subdirectories named *.ss)
-```
+## License
+See [LICENSE](LICENSE.md)

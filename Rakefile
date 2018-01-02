@@ -11,7 +11,6 @@ require 'find'
 CLEAN.include "#{@package}-*.gem"
 CLEAN.include 'pkg'
 CLEAN.include 'dist'
-CLEAN.include 'spec.log'
 Find.find( @rakefile_dir ) do |path|
   if File.directory? path
     CLEAN.include path if File.basename(path) == 'tmp'
@@ -45,8 +44,7 @@ task :spec do
   rtnval = `rspec spec > spec.log`
   puts " test results are #{$?}, logged in spec.log"
   if $? != 0
-#    puts "spec tests failed, results in spec.log"
-     puts IO.read('spec.log')
+    stderr.puts "spec tests failed, results in spec.log"
   else
     puts "spec tests passed - results are #{$?}, logged in spec.log"
   end

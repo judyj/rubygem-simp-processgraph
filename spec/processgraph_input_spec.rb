@@ -14,12 +14,12 @@ describe "testing input only to process graph" do
   FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
 
   Dir.chdir(outdir) do
-    the_graph = ProcessList.new("testfile", nil)
-    the_graph.process_data(site_name)
+    the_graph = ProcessList.new("testfile", nil, false)
+    the_graph.process_data(site_name, 0)
   end
 
   it "created given input file [testfile]" do
-     expect(File).to exist("#{outdir}/testfile")
+     expect(File).to exist("#{outdir}/testfile.raw")
   end
   it "created dot file from input name" do
      expect(File).to exist("#{outdir}/testfile.dot")

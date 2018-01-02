@@ -2,6 +2,7 @@
 # run the process
 # make sure the files are created
 #
+require 'fileutils'
 require 'simp-processgraph'
 require_relative 'spec_helper'
 
@@ -12,12 +13,12 @@ describe "testing process graph with two inputs" do
   FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
 
   Dir.chdir(outdir) do
-    the_graph = ProcessList.new("filein", "fileout")
-    the_graph.process_data(site_name)
+    the_graph = ProcessList.new("filein", "fileout", false)
+    the_graph.process_data(site_name, 0)
   end
 
   it "created input file [filein] given in and out names" do
-     expect(File).to exist("#{outdir}/filein")
+     expect(File).to exist("#{outdir}/filein.raw")
   end
 
   it "created dot file [fileout] given in and out names" do

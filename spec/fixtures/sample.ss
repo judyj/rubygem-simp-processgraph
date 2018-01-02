@@ -1,33 +1,92 @@
-jj, localhost.localdomain, , ALL,9014, , , *, *
-jj, localhost.localdomain, , ALL,5353, , , *, *
-jj, localhost.localdomain, , ALL,46384, , , *, *
-jj, localhost.localdomain, , 127.0.0.1, , , *, *
-jj, localhost.localdomain, , *%virbr0,67, , , *, *
-jj, localhost.localdomain, , ALL,68, , , *, *
-jj, localhost.localdomain, , 127.0.0.1,323, , , *, *
-jj, localhost.localdomain, , 127.0.0.1,631, , , *, *
-jj, localhost.localdomain, , 127.0.0.1,14906, ssh, sample, *, *
-jj, localhost.localdomain, , 127.0.0.1,14907, ssh, sample, *, *
-jj, localhost.localdomain, , 127.0.0.1,14908, ssh, sample, *, *
-jj, localhost.localdomain, , 127.0.0.1,7778, ssh, sample, *, *
-jj, localhost.localdomain, , 127.0.0.1,14900, ssh, sample, *, *
-jj, localhost.localdomain, , 127.0.0.1,14901, ssh, sample, *, *
-jj, localhost.localdomain, , 127.0.0.1,53, , , *, *
-jj, localhost.localdomain, , 127.0.0.1,14902, ssh, sample, *, *
-jj, localhost.localdomain, , 10.244.11.12,47828, ssh, sample, 10.16.163.241, 6969
-jj, localhost.localdomain, , 10.244.11.12,35190, firefox, sample, 10.125.22.120, 443
-jj, localhost.localdomain, , 10.244.11.12,39552, firefox, sample, 10.68.122.100, 443
-jj, localhost.localdomain, , 10.244.11.12,55290, firefox, sample, 10.52.108.76, 443
-jj, localhost.localdomain, , 10.244.11.12,33582, firefox, sample, 10.84.139.26, 443
-jj, localhost.localdomain, , 10.244.11.12,52120, firefox, sample, 10.125.29.189, 443
-jj, localhost.localdomain, , 10.244.11.12,37966, firefox, sample, 10.125.29.138, 443
-jj, localhost.localdomain, , 10.244.11.12,42588, firefox, sample, 10.84.24.190, 443
-jj, localhost.localdomain, , 10.244.11.12,57152, firefox, sample, 10.52.108.76, 443
-jj, localhost.localdomain, , 10.244.11.12,50570, firefox, sample, 10.125.29.83, 443
-jj, localhost.localdomain, , 10.244.11.12,52116, , , 10.113.152.30, 443
-jj, localhost.localdomain, , 10.244.11.12,55864, firefox, sample, 10.125.29.189, 443
-jj, localhost.localdomain, , 10.244.11.12,40710, firefox, sample, 10.125.29.139, 443
-jj, localhost.localdomain, , 10.244.11.12,44988, , , 10.186.104.15, 443
-jj, localhost.localdomain, , 10.244.11.12,52114, , , 10.113.152.30, 443
-jj, localhost.localdomain, , 10.244.11.12,39738, firefox, sample, 10.125.22.102, 443
-jj, localhost.localdomain, , 10.244.11.12,44954, firefox, sample, 10.6.38.139, 443
+testfile,host.my.domain,,ALL,1,,,*,*,
+testfile,host.my.domain,,ALL,62781,,,*,*,
+testfile,host.my.domain,,10.0.122.1,53,,,*,*,
+testfile,host.my.domain,,ALL,,,,%virbr0,67,
+testfile,host.my.domain,,ALL,68,,,*,*,
+testfile,host.my.domain,,10.0.0.1,123,,,*,*,
+testfile,host.my.domain,,10.0.122.1,123,,,*,*,
+testfile,host.my.domain,,10.0.71.110,123,,,*,*,
+testfile,host.my.domain,,127.0.0.1,123,,,*,*,
+testfile,host.my.domain,,ALL,123,,,*,*,
+testfile,host.my.domain,,ALL,3102,Web,,*,*,
+testfile,host.my.domain,,127.0.0.1,5900,,,*,*,
+testfile,host.my.domain,,127.0.0.1,2222,,,*,*,
+testfile,host.my.domain,,10.0.122.1,53,,,*,*,
+testfile,host.my.domain,,ALL,22,,,*,*,
+testfile,host.my.domain,,10.0.0.1,25,,,*,*,
+testfile,host.my.domain,,127.0.0.1,873,,,*,*,
+testfile,host.my.domain,,10.0.71.110,35622,,,10.0.71.106,389,
+testfile,host.my.domain,,10.0.71.110,41016,firefox,johndoe,10.0.217.174,443,
+testfile,host.my.domain,,10.0.71.110,43736,firefox,johndoe,10.0.70.165,443,
+testfile,host.my.domain,,127.0.0.1,5900,,,127.0.0.1,43910,
+testfile,host.my.domain,,10.0.71.110,43090,firefox,johndoe,10.0.217.165,443,
+testfile,host.my.domain,,10.0.71.110,49596,firefox,johndoe,10.0.42.11,443,
+testfile,host.my.domain,,10.0.71.110,56922,firefox,johndoe,10.0.10.227,443,
+testfile,host.my.domain,,10.0.71.110,46220,firefox,johndoe,10.0.103.28,443,
+testfile,host.my.domain,,10.0.71.110,10106,firefox,johndoe,10.0.10.125,443,
+testfile,host.my.domain,,10.0.71.110,43258,firefox,johndoe,10.0.217.165,443,
+testfile,host.my.domain,,10.0.71.110,31090,firefox,johndoe,10.0.253.125,443,
+testfile,host.my.domain,,10.0.71.110,37496,firefox,johndoe,10.0.250.228,443,
+testfile,host.my.domain,,10.0.71.110,37836,firefox,johndoe,10.0.253.124,443,
+testfile,host.my.domain,,10.0.71.110,38456,firefox,johndoe,10.0.201.189,443,
+testfile,host.my.domain,,10.0.71.110,39530,firefox,johndoe,10.0.102.228,443,
+testfile,host.my.domain,,10.0.71.110,36578,,,10.58.218.238,443,
+testfile,host.my.domain,,10.0.71.110,45050,firefox,johndoe,10.0.217.174,443,
+testfile,host.my.domain,,10.0.71.110,957,,,10.0.71.111,2049,
+testfile,host.my.domain,,10.0.71.110,36950,firefox,johndoe,10.0.250.228,443,
+testfile,host.my.domain,,10.0.71.110,38410,firefox,johndoe,10.0.201.189,443,
+testfile,host.my.domain,,10.0.71.110,38468,firefox,johndoe,10.0.201.189,443,
+testfile,host.my.domain,,10.0.71.110,38444,firefox,johndoe,10.0.201.189,443,
+testfile,host.my.domain,,10.0.71.110,49102,firefox,johndoe,10.0.101.222,443,
+testfile,host.my.domain,,127.0.0.1,43910,virt-viewer,johndoe,127.0.0.1,5900,
+testfile,host.my.domain,,10.0.71.110,44492,firefox,johndoe,10.0.217.174,443,
+testfile,host.my.domain,,10.0.71.110,37272,firefox,johndoe,10.0.43.11,443,
+testfile,host.my.domain,,10.0.71.110,36650,firefox,johndoe,10.0.253.125,443,
+testfile,host.my.domain,,10.0.71.110,56178,firefox,johndoe,10.0.142.99,80,
+testfile,host.my.domain,,10.0.71.110,36896,firefox,johndoe,10.0.250.228,443,
+process_list,host.my.domain,,ALL,1,,,*,*,
+process_list,host.my.domain,,ALL,62781,,,*,*,
+process_list,host.my.domain,,10.0.122.1,53,,,*,*,
+process_list,host.my.domain,,ALL,,,,%virbr0,67,
+process_list,host.my.domain,,ALL,68,,,*,*,
+process_list,host.my.domain,,10.0.0.1,123,,,*,*,
+process_list,host.my.domain,,10.0.122.1,123,,,*,*,
+process_list,host.my.domain,,10.0.71.110,123,,,*,*,
+process_list,host.my.domain,,127.0.0.1,123,,,*,*,
+process_list,host.my.domain,,ALL,123,,,*,*,
+process_list,host.my.domain,,ALL,3102,Web,,*,*,
+process_list,host.my.domain,,127.0.0.1,5900,,,*,*,
+process_list,host.my.domain,,127.0.0.1,2222,,,*,*,
+process_list,host.my.domain,,10.0.122.1,53,,,*,*,
+process_list,host.my.domain,,ALL,22,,,*,*,
+process_list,host.my.domain,,127.0.0.1,25,,,*,*,
+process_list,host.my.domain,,127.0.0.1,873,,,*,*,
+process_list,host.my.domain,,10.0.71.110,35622,,,10.0.71.106,389,
+process_list,host.my.domain,,10.0.71.110,41016,firefox,johndoe,10.0.217.174,443,
+process_list,host.my.domain,,10.0.71.110,43736,firefox,johndoe,10.0.70.165,443,
+process_list,host.my.domain,,127.0.0.1,5900,,,127.0.0.1,43910,
+process_list,host.my.domain,,10.0.71.110,43090,firefox,johndoe,10.0.217.165,443,
+process_list,host.my.domain,,10.0.71.110,49596,firefox,johndoe,10.0.42.11,443,
+process_list,host.my.domain,,10.0.71.110,56922,firefox,johndoe,10.0.10.227,443,
+process_list,host.my.domain,,10.0.71.110,46220,firefox,johndoe,10.0.103.28,443,
+process_list,host.my.domain,,10.0.71.110,10106,firefox,johndoe,10.0.10.125,443,
+process_list,host.my.domain,,10.0.71.110,43258,firefox,johndoe,10.0.217.165,443,
+process_list,host.my.domain,,10.0.71.110,31090,firefox,johndoe,10.0.253.125,443,
+process_list,host.my.domain,,10.0.71.110,37496,firefox,johndoe,10.0.250.228,443,
+process_list,host.my.domain,,10.0.71.110,37836,firefox,johndoe,10.0.253.124,443,
+process_list,host.my.domain,,10.0.71.110,38456,firefox,johndoe,10.0.201.189,443,
+process_list,host.my.domain,,10.0.71.110,39530,firefox,johndoe,10.0.102.228,443,
+process_list,host.my.domain,,10.0.71.110,36578,,,10.58.218.238,443,
+process_list,host.my.domain,,10.0.71.110,45050,firefox,johndoe,10.0.217.174,443,
+process_list,host.my.domain,,10.0.71.110,957,,,10.0.71.111,2049,
+process_list,host.my.domain,,10.0.71.110,36950,firefox,johndoe,10.0.250.228,443,
+process_list,host.my.domain,,10.0.71.110,38410,firefox,johndoe,10.0.201.189,443,
+process_list,host.my.domain,,10.0.71.110,38468,firefox,johndoe,10.0.201.189,443,
+process_list,host.my.domain,,10.0.71.110,38444,firefox,johndoe,10.0.201.189,443,
+process_list,host.my.domain,,10.0.71.110,49102,firefox,johndoe,10.0.101.222,443,
+process_list,host.my.domain,,127.0.0.1,43910,virt-viewer,johndoe,127.0.0.1,5900,
+process_list,host.my.domain,,10.0.71.110,44492,firefox,johndoe,10.0.217.174,443,
+process_list,host.my.domain,,10.0.71.110,37272,firefox,johndoe,10.0.43.11,443,
+process_list,host.my.domain,,10.0.71.110,36650,firefox,johndoe,10.0.253.125,443,
+process_list,host.my.domain,,10.0.71.110,56178,firefox,johndoe,10.0.142.99,80,
+process_list,host.my.domain,,10.0.71.110,36896,firefox,johndoe,10.0.250.228,443,
