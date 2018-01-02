@@ -1,19 +1,20 @@
 $: << File.expand_path( '../lib/', __FILE__ )
+require 'simp/processgraph/version'
 require 'date'
 
 Gem::Specification.new do |s|
   s.name        = 'simp-processgraph'
-  s.version     = '0.0.4'
-  s.date        = '2016-01-06'
+  s.version     = Simp::ProcessGraph::VERSION
+  s.date        = Date.today.to_s
   s.summary     = "Visually displays process communications"
   s.description = "A program that uses dot and graphviz to graph your process relationships"
   s.authors     = ["SIMP team"]
   s.email       = 'simp@simp-project.org'
   s.files       = ["lib/simp-processgraph.rb"]
-  s.homepage    =
-    'https://github.com/simp/rubygem-simp-processgraph'
-  #s.metadata = {
-  #               'issue_tracker' => 'https://github.com/simp/rubygem-simp-processgraph/issues'
+  s.homepage    = 'https://github.com/simp/rubygem-simp-processgraph'
+  # s.metadata does not seem to work in ruby < 2, so it fails the travis test unless we have it commented out
+  # s.metadata = {
+  #               'issue_tracker' => 'https://simp-project.atlassian.net'
   #             }
   s.executables = 'processgraph'
   s.license       = 'Apache-2.0'
@@ -21,8 +22,6 @@ Gem::Specification.new do |s|
   # gem dependencies
   #   for the published gem
   s.required_ruby_version = '>=1.8.7'
-
-  # not using this s.add_runtime_dependency 'gviz',  '~> 0.3.5'
 
   # for development
   s.add_development_dependency 'rake',        '~> 10'
