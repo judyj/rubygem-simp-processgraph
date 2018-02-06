@@ -612,14 +612,40 @@ def file_input(inputfile, outputfile, filetype, site_name)
           if local_ip == "*"
             local_ip = "ALL"
           end
-          local_port = f2[1]
+          # check for ipv6
+          #if (f2.length > 5) # ipv6
+             local_ip = local_add.rpartition(':').first
+             local_port = local_add.rpartition(':').last
+          #else # ipv4 or nothing
+          #  local_ip = f2[0]
+          #  if local_ip == "*"
+          #    local_ip = "ALL"
+          #  end
+          #  local_port = f2[1]
+          #end
           if (local_ip == '' && local_port == '')
             cancel = true
           end
+
 #         for the dest address split address and proc via colon
           f3 = peer_add.split(':').map(&:strip)
-          peer_ip = f3[0]
-          peer_port = f3[1]
+          #peer_ip = f3[0]
+          #peer_port = f3[1]
+          #if (f3.length > 5) # ipv6
+             peer_ip = peer_add.rpartition(':').first
+             peer_port = peer_add.rpartition(':').last
+            if peer_ip == "::"
+              peer_ip = ""
+            end
+          #else # ipv4 or nothing
+          #  peer_ip = f3[0]
+          #  if peer_ip == "*"
+          #    peer_ip = ""
+          #  end
+          #  peer_port = f3[1]
+          #end
+
+
 #         create peer record and local record and associate the numbers
           f4 = socket_users.split(':').map(&:strip)
           proto = f4[1]
