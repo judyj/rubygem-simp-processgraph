@@ -590,6 +590,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
 #       *** for npatuw ***
         begin
           cancel = false
+    puts "line is #{line}"
           f1 = line.split(' ').map(&:strip)
           state = f1[1]
           rec_q = f1[2]
@@ -599,51 +600,36 @@ def file_input(inputfile, outputfile, filetype, site_name)
           send_q = f1[3]
 ### judy is swapping the local and remote addresses if state is LISTEN or UNCONN 5/22/17
           if state == "LISTEN" or state == "UNCONN"
-            local_add = f1[4] # BACK
-            peer_add = f1[5]
+            local_add = f1[5] # BACK
+            peer_add = f1[4]
           else
             local_add = f1[4]
             peer_add = f1[5]
           end
           socket_users = f1[6]
 #         for the local address split address and proc via colon
-          f2 = local_add.split(':').map(&:strip)
-          local_ip = f2[0]
-          if local_ip == "*"
+
+          local_ip = local_add.rpartition(':').first
+          if (local_ip == "*") or (local_ip[0..1] == "::")
             local_ip = "ALL"
           end
-          # check for ipv6
-          #if (f2.length > 5) # ipv6
-             local_ip = local_add.rpartition(':').first
-             local_port = local_add.rpartition(':').last
-          #else # ipv4 or nothing
-          #  local_ip = f2[0]
-          #  if local_ip == "*"
-          #    local_ip = "ALL"
-          #  end
-          #  local_port = f2[1]
-          #end
+          local_port = local_add.rpartition(':').last
           if (local_ip == '' && local_port == '')
+            cancel = true
+          end
+          if (local_ip == "::1") or (local_ip == "127.0.0.1")
             cancel = true
           end
 
 #         for the dest address split address and proc via colon
-          f3 = peer_add.split(':').map(&:strip)
-          #peer_ip = f3[0]
-          #peer_port = f3[1]
-          #if (f3.length > 5) # ipv6
-             peer_ip = peer_add.rpartition(':').first
-             peer_port = peer_add.rpartition(':').last
-            if peer_ip == "::"
-              peer_ip = ""
-            end
-          #else # ipv4 or nothing
-          #  peer_ip = f3[0]
-          #  if peer_ip == "*"
-          #    peer_ip = ""
-          #  end
-          #  peer_port = f3[1]
-          #end
+          peer_ip = peer_add.rpartition(':').first
+          if (peer_ip == "*") or (peer_ip[0..1] == "::")
+            peer_ip = "ALL"
+          end
+          if (peer_ip == "::1") or (peer_ip == "127.0.0.1")
+            cancel = true
+          end
+          peer_port = peer_add.rpartition(':').last
 
 
 #         create peer record and local record and associate the numbers
@@ -680,20 +666,22 @@ def file_input(inputfile, outputfile, filetype, site_name)
           hostname = File.basename(host, ".*")
         end
 
-        domainname = ''
+# if it is a browser, we do not need all the gory details
         peer_proc = ''
+        if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
+          proc_name = "browser"
+          local_port = "local"
+          peer_ip = "www"
+          peer_port = ""
+          peer_proc = ""
+        end
+ 
+        domainname = ''
 
 #       write both sets to hashes
 #       ignore header line
         unless cancel
 # if you are on the www, let's fix this now
-         if (proc_name == 'firefox' or proc_name == 'chrome' or proc_name == 'browser')
-            proc_name = "browser"
-            local_port = "local"
-            peer_ip = "www"
-            peer_port = "www"
-            peer_proc = "browser"
-          end
           datarow = Hash.new
           datarow["site_name"] = site_name
           datarow["hostname"] = hostname
