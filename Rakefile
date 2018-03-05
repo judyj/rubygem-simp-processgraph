@@ -1,18 +1,18 @@
 # -*- ruby -*-
 
-require "rubygems"
+require 'rubygems'
 require 'rake/clean'
 require 'fileutils'
 require 'find'
 
-@package='simp-processgraph'
-@rakefile_dir=File.dirname(__FILE__)
+@package = 'simp-processgraph'
+@rakefile_dir = File.dirname(__FILE__)
 
 CLEAN.include "#{@package}-*.gem"
 CLEAN.include 'pkg'
 CLEAN.include 'dist'
 CLEAN.include 'spec.log'
-Find.find( @rakefile_dir ) do |path|
+Find.find(@rakefile_dir) do |path|
   if File.directory? path
     CLEAN.include path if File.basename(path) == 'tmp'
   else
@@ -30,24 +30,24 @@ task :help do
   sh 'rake -T'
 end
 
-#desc 'Ensure gemspec-safe permissions on all files'
-#task :chmod do
-#  gemspec = File.expand_path( "#{@package}.gemspec", @rakefile_dir ).strip
-#  spec = Gem::Specification::load( gemspec )
-#  spec.files.each do |file|
-#    FileUtils.chmod 'go=r', file
-#  end
-#end
+# desc 'Ensure gemspec-safe permissions on all files'
+# task :chmod do
+#   gemspec = File.expand_path( "#{@package}.gemspec", @rakefile_dir ).strip
+#   spec = Gem::Specification::load( gemspec )
+#   spec.files.each do |file|
+#     FileUtils.chmod 'go=r', file
+#   end
+# end
 
 desc 'run all RSpec tests'
 task :spec do
   Dir.chdir @rakefile_dir
-  rtnval = `rspec spec > spec.log`
-  puts " test results are #{$?}, logged in spec.log"
-  if $? != 0
-     puts IO.read('spec.log')
+  `rspec spec > spec.log`
+  puts " test results are #{$CHILD_STATUS}, logged in spec.log"
+  if $CHILD_STATUS != 0
+    puts IO.read('spec.log')
   else
-    puts "spec tests passed - results are #{$?}, logged in spec.log"
+    puts "spec tests passed - results are #{$CHILD_STATUS}, logged in spec.log"
   end
 end
 
@@ -56,7 +56,7 @@ namespace :pkg do
   task :gem do
     Dir.chdir @rakefile_dir
     Dir['*.gemspec'].each do |spec_file|
-      cmd = %Q{SIMP_RPM_BUILD=1 gem build "#{spec_file}"}
+      cmd = %(SIMP_RPM_BUILD=1 gem build "#{spec_file}")
       sh cmd
       FileUtils.mkdir_p 'dist'
       FileUtils.mv Dir.glob("#{@package}*.gem"), 'dist/'
@@ -67,7 +67,7 @@ namespace :pkg do
   task :install_gem => [:clean, :gem] do
     Dir.chdir @rakefile_dir
     Dir.glob("dist/#{@package}*.gem") do |pkg|
-      sh %Q{gem install #{pkg}}
+      sh %(gem install #{pkg})
     end
   end
 end

@@ -63,7 +63,8 @@ class ProcessList
       @filetype = 'dir'
     elsif (File.file?@inputfile) && ((File.extname(@inputfile)) == @sstype)
       @filetype = 'file'
-    elsif (File.file?@inputfile) && ((@raw == true) || (File.extname(@inputfile) == @rawtype))
+    elsif (File.file?@inputfile) && ((@raw == true) ||
+      (File.extname(@inputfile) == @rawtype))
       @filetype = 'raw'
     else
       infile = @inputfile
@@ -88,18 +89,18 @@ class ProcessList
       # if we are on the www (firefox or chrome), let's condense those calls
       proc_name = record['proc_name']
       port_name = record['local_port']
-      if (proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser')
+      if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
         port_name = 'local'
         proc_name = 'browser'
       end
       new_proc = new_ip.add_proc(record['proc_name'])
       new_port = new_proc.add_port(port_name)
       # destinations
-      if ( (record['peer_ip']!= "*") && (record['peer_port']!= "*"))
-        dest_site = the_start.add_site("")
-        dest_host = dest_site.add_host("")
+      if ( (record['peer_ip']!= '*') && (record['peer_port']!= '*'))
+        dest_site = the_start.add_site('')
+        dest_host = dest_site.add_host('')
         peer_proc = record['peer_proc']
-        if (proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser')
+        if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
           dest_ip = dest_host.add_ip('www')
           dest_proc = dest_ip.add_proc('browser')
           dest_port = dest_proc.add_port('www')
@@ -155,7 +156,8 @@ class ProcessList
 
   def graph_processes(gv, out_file, con_type)
     outputfile = out_file
-    # rank TB makes the graph go from top to bottom - works better right now with the CentOS version
+    # rank TB makes the graph go from top to bottom
+    # works better right now with the CentOS version
     # rank LR draws left to right which is easier to read
     Gv.layout(gv, 'dot')
     Gv.setv(gv, 'rankdir', 'LR')
@@ -253,12 +255,13 @@ class ProcessList
     # con_type = 0 # port [T]
     # con_type = 1 # process [R]
     # con_type = 2 # ip [I]
-    colors = Array['yellow','green','orange','violet', 'turquoise', 'gray','brown']
+    colors = Array['yellow','green','orange','violet',
+                   'turquoise', 'gray','brown']
     count = 0
     outputfile = out_file
 
     # tell the user what we're up to
-    $stdout.puts "assembling graph"
+    $stdout.puts 'assembling graph'
 
     # progress through the sites
     @site_list.each do |sitenm|
@@ -272,7 +275,7 @@ class ProcessList
             ip.connections_i.each do |conn|
               start_node = ip.graph_node
               end_node = conn.graph_node
-              if (end_node != nil && start_node != nil) then
+              if (end_node != nil && start_node != nil)
                 start_end = {}
                 start_end["start"] = start_node
                 start_end["end"] = end_node
@@ -292,10 +295,10 @@ class ProcessList
               myproc.connections_r.each do |conn|
                 start_node = myproc.graph_node
                 end_node = conn.graph_node
-                if (end_node != nil && start_node != nil) then
+                if (end_node != nil && start_node != nil)
                   start_end = {}
-                  start_end["start"] = start_node
-                  start_end["end"] = end_node
+                  start_end['start'] = start_node
+                  start_end['end'] = end_node
                   line_array << start_end
                 end
                 # not ''
@@ -314,8 +317,8 @@ class ProcessList
                   end_node = conn.graph_node
                   if (end_node != nil && start_node != nil)
                      start_end = {}
-                     start_end["start"] = start_node
-                     start_end["end"] = end_node
+                     start_end['start'] = start_node
+                     start_end['end'] = end_node
                      line_array << start_end
                   end
                   # not ''
@@ -338,8 +341,8 @@ class ProcessList
     line_array.uniq!
     line_array.each do |start_end|
       count += 1
-      start_node = start_end["start"]
-      end_node = start_end["end"]
+      start_node = start_end['start']
+      end_node = start_end['end']
       colorcode =  count.modulo(colors.size)
       eg = Gv.edge(gv, start_node, end_node)
       # connect the dots
@@ -351,7 +354,7 @@ class ProcessList
     results = `dot -Tpng #{outputfile}.dot -o #{outputfile}.png 2> /dev/null`
     if $?.success? then
     else
-      $stderr.puts "dot command failed"
+      $stderr.puts 'dot command failed'
     end
   end # graph_connections
 end # ProcessList
@@ -563,7 +566,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
   @filetype = filetype
   @site_name = site_name
 
-  new_ss = false # set to true if we are running ss the first time to get the correct hostname
+  # set to true if we are running ss the first time to get the correct hostname
+  new_ss = false #assume false at first
 
   # this ss command lists processes to a file
   # comment out for a test file
@@ -594,9 +598,9 @@ def file_input(inputfile, outputfile, filetype, site_name)
 
     # got through - check to ensure we got a file
     if infiles.size == 0
-       $stderr.puts "no files found"
+       $stderr.puts 'no files found'
     end
-    @inputfile = @inputfile+"_dir"
+    @inputfile = @inputfile+'_dir'
     if @outputfile == nil
       @outputfile = @inputfile
     end
@@ -612,7 +616,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
     @file_counter = 0
     # read each input file in the directory
     infiles.each do |infile|
-      numProcs = 0
       @file_counter += 1
       justfile1 = File.basename(infile,@rawtype)
       p1 = justfile1.split('.')
@@ -658,7 +661,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
 
           local_ip = local_add.rpartition(':').first
           if (local_ip == '*') || (local_ip[0..1] == '::')
-            local_ip = "ALL"
+            local_ip = 'ALL'
           end
           local_port = local_add.rpartition(':').last
           if (local_ip == '' && local_port == '')
@@ -671,7 +674,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           # for the dest address split address and proc via colon
           peer_ip = peer_add.rpartition(':').first
           if (peer_ip == '*') || (peer_ip[0..1] == '::')
-            peer_ip = "ALL"
+            peer_ip = 'ALL'
           end
           if (peer_ip == '::1') || (peer_ip == '127.0.0.1')
             cancel = true
@@ -710,14 +713,14 @@ def file_input(inputfile, outputfile, filetype, site_name)
           hostname = File.basename(host, '.*')
         end
 
-        # if it is a browser, we do not need all the g||y details
+        # if it is a browser, we do not need all the gory details
         peer_proc = ''
-        if (proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser')
+        if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
           proc_name = 'browser'
           local_port = 'local'
           peer_ip = 'www'
-          peer_port = ""
-          peer_proc = ""
+          peer_port = ''
+          peer_proc = ''
         end
 
         domainname = ''
@@ -763,7 +766,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
     @file_counter = 0
     infiles.each do |infile|
       justfile = File.basename(infile,@sstype)
-      numProcs = 0
       @file_counter += 1
       # read the file, one line at a time
       IO.foreach(infile) do |line|
@@ -776,13 +778,9 @@ def file_input(inputfile, outputfile, filetype, site_name)
           hostname = f1[1]
           domainname = f1[2]
           local_ip = f1[3]
-          if local_ip == "*"
-            local_ip = "ALL"
-          end
+          if local_ip == '*' then local_ip = 'ALL' end
           local_port = f1[4]
-          if (local_ip == '' && local_port == '')
-            cancel = true
-          end
+          if (local_ip == '' && local_port == '') then cancel = true end
           proc_name = f1[5]
           proc_user = f1[6]
           peer_ip = f1[7]
@@ -791,15 +789,15 @@ def file_input(inputfile, outputfile, filetype, site_name)
           peer_proc = ''
         rescue
           # ignore everything else
-          # puts "error parsing #{infile} - badly formatted ss file, ignoring line\n #{line}"
+          # puts "error parsing #{infile} - ignoring\n #{line}"
         end
         # current domain and host
 
         if (f1.size < 7)
-          # puts "#{infile} not enough fields - badly formatted ss file, ignoring line\n #{line}"
+          # puts "#{infile} not enough fields - ignoring\n #{line}"
         else
           # if you are on the www, let's fix this now
-          if (proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser')
+          if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
             proc_name = 'browser'
             local_port = 'local'
             peer_ip = 'www'
@@ -807,7 +805,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
             peer_proc = 'browser'
           end
 
-          # judy fix this to get the correct hostname - if brand new figure it out, if not, use the filename
+          # judy fix this to get the correct hostname
+          # if brand new figure it out, if not, use the filename
           if new_ss
             hostname = "#{Socket.gethostname}"
           else
@@ -850,7 +849,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
   end
   # new file
   print_array(@all_comms, @outputfile)
-  return @all_comms
+  # return @all_comms
 end
 # file_input
 
