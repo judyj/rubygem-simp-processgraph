@@ -12,64 +12,64 @@ infile = nil
 raw = false
 outfile = nil
 site_name = nil
-con_type = 0 
+con_type = 0
 
 optsparse = OptionParser.new do |opts|
-  opts.banner = "Usage: processgraph -s sitename [options]"
+  opts.banner = 'Usage: processgraph -s sitename [options]'
   opts.banner += "\nNote: use full pathname for input files and directories\n"
   opts.banner += "\n      directory path is set for output files and directories\n"
   opts.on('-h', '--help', 'Help') do
     puts opts
     exit
   end
-  opts.on('-s', '--site NAME', 'Site Name (required!)') do |s| 
-#    puts "site name is #{s}"
+  opts.on('-s', '--site NAME', 'Site Name (required!)') do |s|
+    #    puts "site name is #{s}"
     site_name = s.strip
   end
-  opts.on('-i', '--input FILENAME', 'Input file or directory name') do|i|
-#    puts "input filename is #{i}"
+  opts.on('-i', '--input FILENAME', 'Input file or directory name') do |i|
+    #    puts "input filename is #{i}"
     infile = i.strip
   end
-  opts.on('-r', '--raw RAWFILENAME', 'Input raw file or directory name piped from ss -npatuw') do|r|
-#    puts "input filename is #{r}"
+  opts.on('-r', '--raw RAWFILENAME', 'Input raw file or directory name piped from ss -npatuw') do |r|
+    #    puts "input filename is #{r}"
     infile = r.strip
     raw = true
   end
-  opts.on('-c', '--connection NAME', 'Connection type (T = Port, R = Process, I = IP)') do |c| 
-#    puts "connection is #{c}"
-    $con = c.strip 
-#  con_type = 0 # port [T]
-#  con_type = 1 # process [R]
-#  con_type = 2 # ip [I]
-   case c
-    when "I", "i"
+  opts.on('-c', '--connection NAME', 'Connection type (T = Port, R = Process, I = IP)') do |c|
+    #    puts "connection is #{c}"
+    $con = c.strip
+    #  con_type = 0 # port [T]
+    #  con_type = 1 # process [R]
+    #  con_type = 2 # ip [I]
+    case c
+    when 'I', 'i'
       con_type = 2
-    when "R", "r"
+    when 'R', 'r'
       con_type = 1
-    when "T", "t"
+    when 'T', 't'
       con_type = 0
     else
-      puts "Invalid connection type"
+      puts 'Invalid connection type'
       puts "graph level option is #{con_type}"
       exit
-    end
+     end
   end # connection option
   out_msg =  'Output filename'
-  opts.on('-o', '--output FILENAME','File name root (directory is predetermined)') do |o| 
-     if $debug then puts "output filename is #{o}" end
+  opts.on('-o', '--output FILENAME', 'File name root (directory is predetermined)') do |o|
+    puts "output filename is #{o}" if $debug
     outfile = o.strip
   end
 end # OptionParser
 
-  optsparse.parse!
+optsparse.parse!
 
 unless site_name
-  puts "Missing argument -s"
+  puts 'Missing argument -s'
   puts optsparse.banner
   exit
 end
 
-outdir = File.join('processgraph_output',site_name)
+outdir = File.join('processgraph_output', site_name)
 FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
 
 Dir.chdir(outdir) do

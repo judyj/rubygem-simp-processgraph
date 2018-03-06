@@ -1,4 +1,4 @@
-$: << File.expand_path('../lib/', __FILE__)
+$LOAD_PATH << File.expand_path('../lib/', __FILE__)
 require 'simp/processgraph/version'
 require 'date'
 
@@ -12,13 +12,13 @@ Gem::Specification.new do |s|
   s.email       = 'simp@simp-project.org'
   s.files       = ['lib/simp-processgraph.rb']
   s.homepage    = 'https://github.com/simp/rubygem-simp-processgraph'
-  # s.metadata does not seem to work in ruby < 2, 
+  # s.metadata does not seem to work in ruby < 2,
   # so it fails the travis test unless we have it commented out
   # s.metadata = {
   #               'issue_tracker' => 'https://simp-project.atlassian.net'
   #             }
   s.executables = 'processgraph'
-  s.license       = 'Apache-2.0'
+  s.license = 'Apache-2.0'
 
   # gem dependencies
   #   for the published gem
@@ -33,5 +33,4 @@ Gem::Specification.new do |s|
 
   # ensure the gem is built out of versioned files
   s.files = Dir['Rakefile', '{bin,lib,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files -z .`.split("\0")
-
 end

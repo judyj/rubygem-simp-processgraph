@@ -21,9 +21,9 @@ Find.find(@rakefile_dir) do |path|
 end
 
 desc 'default - help'
-task :default => [:help]
+task default: [:help]
 
-task :test => [:spec]
+task test: [:spec]
 
 desc 'help'
 task :help do
@@ -64,7 +64,7 @@ namespace :pkg do
   end
 
   desc "build and install rubygem package for #{@package}"
-  task :install_gem => [:clean, :gem] do
+  task install_gem: %i[clean gem] do
     Dir.chdir @rakefile_dir
     Dir.glob("dist/#{@package}*.gem") do |pkg|
       sh %(gem install #{pkg})
