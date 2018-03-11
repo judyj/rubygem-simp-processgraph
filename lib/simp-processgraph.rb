@@ -67,7 +67,6 @@ class ProcessList
       (File.extname(@inputfile) == @rawtype))
       @filetype = 'raw'
     else
-      infile = @inputfile
       @filetype = 'none'
     end
 
@@ -151,8 +150,7 @@ class ProcessList
   end
   # end printSites
 
-  def graph_processes(gv, out_file, con_type)
-    outputfile = out_file
+  def graph_processes(gv, _out_file, con_type)
     # rank TB makes the graph go from top to bottom
     # works better right now with the CentOS version
     # rank LR draws left to right which is easier to read
@@ -336,9 +334,8 @@ class ProcessList
       # connect the dots
       Gv.setv(eg, 'color', colors[colorcode])
     end
-    success = Gv.write(gv, "#{outputfile}.dot")
+    Gv.write(gv, "#{outputfile}.dot")
     # for now, create the dot this way, see if we can find correction
-    # results = %x(dot -Tpng #{outputfile}.dot -o #{outputfile}.png)
     results = `dot -Tpng #{outputfile}.dot -o #{outputfile}.png 2> /dev/null`
     if $?.success?
     else
@@ -594,9 +591,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
     # read each input file in the directory
     infiles.each do |infile|
       @file_counter += 1
-      justfile1 = File.basename(infile, @rawtype)
-      p1 = justfile1.split('.')
-      justfile = p1[0]
       # read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
@@ -606,11 +600,8 @@ def file_input(inputfile, outputfile, filetype, site_name)
         domainname = ''
         hostname = ''
         local_ip = ''
-        local_proc = ''
+        proc_name = ''
         peer_ip = ''
-        peer_proc = ''
-        proto = ''
-        port_name = ''
         proc_user = ''
 
         # break out the fields
@@ -622,7 +613,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
           state = f1[1]
           rec_q = f1[2]
           cancel = true if rec_q == 'Recv-Q'
-          send_q = f1[3]
           ### judy is swapping the local and remote addresses if state is LISTEN or UNCONN 5/22/17
           if state == 'LISTEN' || state == 'UNCONN'
             local_add = f1[5] # BACK
@@ -687,8 +677,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
           peer_proc = ''
         end
 
-        domainname = ''
-
         # write both sets to hashes
         # ignore header line
         unless cancel
@@ -729,14 +717,12 @@ def file_input(inputfile, outputfile, filetype, site_name)
     # read each input file in the directory
     @file_counter = 0
     infiles.each do |infile|
-      justfile = File.basename(infile, @sstype)
       @file_counter += 1
       # read the file, one line at a time
       IO.foreach(infile) do |line|
         line.strip!
 
         begin
-          cancel = false
           f1 = line.split(',').map(&:strip)
           # judy sitename fix site_name = f1[0]
           hostname = f1[1]
@@ -744,7 +730,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
           local_ip = f1[3]
           local_ip = 'ALL' if local_ip == '*'
           local_port = f1[4]
-          cancel = true if local_ip == '' && local_port == ''
           proc_name = f1[5]
           proc_user = f1[6]
           peer_ip = f1[7]
@@ -778,11 +763,9 @@ def file_input(inputfile, outputfile, filetype, site_name)
             hostname = File.basename(host, '.*')
           end
 
-          domainname = ''
           # write both sets to hashes
           datarow = {}
           datarow['site_name'] = site_name
-          # judy sitename fix datarow['site_name'] = justfile
           datarow['hostname'] = hostname
           datarow['domainname'] = domainname
           datarow['local_ip'] = local_ip
@@ -795,7 +778,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
                                    proc_user
                                  else
                                    ''
-                                 end
+                               end
           datarow['process_name'] = proc_name
           datarow['process_user'] = proc_user
           datarow['peer_ip'] = peer_ip

@@ -7,17 +7,17 @@ require 'optparse'
 require 'socket'
 require 'simp-processgraph'
 
-options = {}
 infile = nil
 raw = false
 outfile = nil
 site_name = nil
 con_type = 0
+debug = false
 
 optsparse = OptionParser.new do |opts|
   opts.banner = 'Usage: processgraph -s sitename [options]'
   opts.banner += "\nNote: use full pathname for input files and directories\n"
-  opts.banner += "\n      directory path is set for output files and directories\n"
+  opts.banner += "\n      dir path is set for output files and directories\n"
   opts.on('-h', '--help', 'Help') do
     puts opts
     exit
@@ -30,14 +30,15 @@ optsparse = OptionParser.new do |opts|
     #    puts "input filename is #{i}"
     infile = i.strip
   end
-  opts.on('-r', '--raw RAWFILENAME', 'Input raw file or directory name piped from ss -npatuw') do |r|
+  outmsg = 'Input raw file or directory name piped from ss -npatuw'
+  opts.on('-r', '--raw RAWFILENAME', outmsg) do |r|
     #    puts "input filename is #{r}"
     infile = r.strip
     raw = true
   end
-  opts.on('-c', '--connection NAME', 'Connection type (T = Port, R = Process, I = IP)') do |c|
+  outmsg = 'Connection type (T = Port, R = Process, I = IP)'
+  opts.on('-c', '--connection NAME', outmsg) do |c|
     #    puts "connection is #{c}"
-    $con = c.strip
     #  con_type = 0 # port [T]
     #  con_type = 1 # process [R]
     #  con_type = 2 # ip [I]
@@ -52,14 +53,16 @@ optsparse = OptionParser.new do |opts|
       puts 'Invalid connection type'
       puts "graph level option is #{con_type}"
       exit
-     end
-  end # connection option
-  out_msg =  'Output filename'
-  opts.on('-o', '--output FILENAME', 'File name root (directory is predetermined)') do |o|
-    puts "output filename is #{o}" if $debug
+    end
+  end
+  # connection option
+  msg = 'File name root (directory is predetermined)'
+  opts.on('-o', '--output FILENAME', msg) do |o|
+    puts "output filename is #{o}" if debug
     outfile = o.strip
   end
-end # OptionParser
+end
+# OptionParser
 
 optsparse.parse!
 
