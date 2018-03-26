@@ -16,6 +16,8 @@ describe 'testing process graph with two inputs' do
   Dir.chdir(outdir) do
     the_graph = ProcessList.new('filein', 'fileout', false)
     the_graph.process_data(site_name, 0)
+    # i called print_sites just to make sure we had code coverage - it's a debug tool
+    # the_graph.print_sites
   end
   # check for raw file
   it 'created input file [filein] given in and out names' do

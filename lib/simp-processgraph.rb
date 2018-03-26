@@ -143,7 +143,7 @@ class ProcessList
 
   def print_sites
     @site_list.each do |site|
-      puts "site name is #{site.site_name}"
+      $stdout.puts "site name is #{site.site_name}"
       site.print_hosts
     end
     # end site
@@ -377,7 +377,7 @@ class SiteName
 
   def print_hosts
     @host_list.each do |hostnm|
-      puts "hostname is #{hostnm}"
+      $stdout.puts "hostname is #{hostnm.hostname}"
       hostnm.print_ips
     end
     # site
@@ -415,7 +415,7 @@ class HostName
 
   def print_ips
     @ip_list.each do |ipnm|
-      puts "ip is #{ipnm.ip}"
+      $stdout.puts "ip is #{ipnm.ip}"
       ipnm.print_proc_list
     end # IP
   end # print_ips
@@ -459,7 +459,7 @@ class IPAddr
 
   def print_proc_list
     @proc_list.each do |_proc|
-      puts "proc is #{_proc.proc_name}"
+      $stdout.puts "proc is #{_proc.proc_name}"
       _proc.print_ports
     end
     # Proc
@@ -510,7 +510,7 @@ class ProcessName
 
   def print_ports
     @port_list.each do |port|
-      puts "port is #{port.port}"
+      $stdout.puts "port is #{port.port}"
     end
     # ports
   end
@@ -608,7 +608,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
         # *** for npatuw ***
         begin
           cancel = false
-          # puts "line is #{line}"
           f1 = line.split(' ').map(&:strip)
           state = f1[1]
           rec_q = f1[2]
