@@ -141,14 +141,14 @@ class ProcessList
     end
   end
 
-  def printSites
+  def print_sites
     @site_list.each do |site|
       puts "site name is #{site.site_name}"
       site.print_hosts
     end
     # end site
   end
-  # end printSites
+  # end print_sites
 
   def graph_processes(gv, _out_file, con_type)
     # rank TB makes the graph go from top to bottom
@@ -375,14 +375,14 @@ class SiteName
     end
   end
 
-  def printHosts
+  def print_hosts
     @host_list.each do |hostnm|
       puts "hostname is #{hostnm}"
       hostnm.print_ips
     end
     # site
   end
-  # printHosts
+  # print_hosts
 end
 # SiteName
 
@@ -460,7 +460,7 @@ class IPAddr
   def print_proc_list
     @proc_list.each do |_proc|
       puts "proc is #{_proc.proc_name}"
-      _proc.printports
+      _proc.print_ports
     end
     # Proc
   end
@@ -508,13 +508,13 @@ class ProcessName
   end
   # add_port
 
-  def printports
+  def print_ports
     @port_list.each do |port|
       puts "port is #{port.port}"
     end
     # ports
   end
-  # printports
+  # print_ports
 
   def add_connection(proc)
     @connections_r << proc
