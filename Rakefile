@@ -64,7 +64,7 @@ namespace :pkg do
   end
 
   desc "build and install rubygem package for #{@package}"
-  task install_gem: %i[clean gem] do
+  task install_gem: %i(clean gem) do
     Dir.chdir @rakefile_dir
     Dir.glob("dist/#{@package}*.gem") do |pkg|
       sh %(gem install #{pkg})

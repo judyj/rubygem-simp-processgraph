@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Simp::ProcessGraph::VERSION
   s.date        = Date.today.to_s
   s.summary     = 'Visually displays process communications'
-  s.description = 'A program that uses dot and graphviz to graph your process relationships'
+  s.description = 'Uses dot and graphviz to graph your process relationships'
   s.authors     = ['SIMP team']
   s.email       = 'simp@simp-project.org'
   s.files       = ['lib/simp-processgraph.rb']

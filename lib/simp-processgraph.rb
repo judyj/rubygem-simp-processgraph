@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 ######################################
 # simp-processgraph
 # This code allows you to plot the communications between hosts.
@@ -61,9 +60,9 @@ class ProcessList
 
     if File.directory? @inputfile
       @filetype = 'dir'
-    elsif (File.file?@inputfile) && (File.extname(@inputfile) == @sstype)
+    elsif (File.file? @inputfile) && (File.extname(@inputfile) == @sstype)
       @filetype = 'file'
-    elsif (File.file?@inputfile) && ((@raw == true) ||
+    elsif (File.file? @inputfile) && ((@raw == true) ||
       (File.extname(@inputfile) == @rawtype))
       @filetype = 'raw'
     else
@@ -86,7 +85,7 @@ class ProcessList
       # if we are on the www (firefox or chrome), let's condense those calls
       proc_name = record['proc_name']
       port_name = record['local_port']
-      if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
+      if %w(firefox chrome browser).include?(proc_name)
         port_name = 'local'
         proc_name = 'browser'
       end
@@ -97,7 +96,7 @@ class ProcessList
       dest_site = the_start.add_site('')
       dest_host = dest_site.add_host('')
       peer_proc = record['peer_proc']
-      if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
+      if %w(firefox chrome browser).include?(proc_name)
         dest_ip = dest_host.add_ip('www')
         dest_proc = dest_ip.add_proc('browser')
         dest_port = dest_proc.add_port('www')
@@ -112,11 +111,11 @@ class ProcessList
     end
 
     # Graph the things
-    gv = Gv.digraph('ProcessGraph')
+    mygraph = Gv.digraph('ProcessGraph')
     # Nodes
-    the_start.graph_processes(gv, @outputfile, @con_type)
+    the_start.graph_processes(mygraph, @outputfile, @con_type)
     # Connectors
-    the_start.graph_connections(gv, @outputfile, @con_type)
+    the_start.graph_connections(mygraph, @outputfile, @con_type)
   end
   # end process_data
 
@@ -150,15 +149,14 @@ class ProcessList
   end
   # end print_sites
 
-  def graph_processes(gv, _out_file, con_type)
+  def graph_processes(mygraph, _out_file, con_type)
     # rank TB makes the graph go from top to bottom
     # works better right now with the CentOS version
     # rank LR draws left to right which is easier to read
-    Gv.layout(gv, 'dot')
-    Gv.setv(gv, 'rankdir', 'LR')
-    Gv.setv(gv, 'splines', 'true')
-    Gv.setv(gv, 'strict', 'true')
-    # Gv.setv(gv, 'constraint', 'true') # test jj 12/11/17
+    Gv.layout(mygraph, 'dot')
+    Gv.setv(mygraph, 'rankdir', 'LR')
+    Gv.setv(mygraph, 'splines', 'true')
+    Gv.setv(mygraph, 'strict', 'true')
     upno = 0
     sitecount = 0
     hostcount = 0
@@ -168,7 +166,7 @@ class ProcessList
     # progress through the sites
     @site_list.each do |sitenm|
       sitecount += 1
-      sg = Gv.graph(gv, "cluster#{upno}")
+      sg = Gv.graph(mygraph, "cluster#{upno}")
       Gv.setv(sg, 'color', 'black')
       Gv.setv(sg, 'label', sitenm.site_name.to_s)
       Gv.setv(sg, 'shape', 'box')
@@ -198,22 +196,22 @@ class ProcessList
           ip.graph_node = "k#{upno}"
           upno += 1
           next unless con_type < 2
-          ip.proc_list.each do |_proc|
+          ip.proc_list.each do |theproc|
             proccount += 1
             sgd = Gv.graph(sgc, "cluster#{proccount}")
             Gv.setv(sgd, 'color', 'green')
-            Gv.setv(sgd, 'label', _proc.proc_name.to_s)
+            Gv.setv(sgd, 'label', theproc.proc_name.to_s)
             Gv.setv(sgd, 'shape', 'box')
             ngb = Gv.node(sgd, "k#{upno}")
-            Gv.setv(ngb, 'label', _proc.proc_name.to_s)
+            Gv.setv(ngb, 'label', theproc.proc_name.to_s)
             Gv.setv(ngb, 'style', 'filled')
             Gv.setv(ngb, 'shape', 'point')
             Gv.setv(ngb, 'color', 'white')
             Gv.setv(ngb, 'width', '0.01')
-            _proc.graph_node = "k#{upno}"
+            theproc.graph_node = "k#{upno}"
             upno += 1
             next unless con_type < 1
-            _proc.port_list.each do |portno|
+            theproc.port_list.each do |portno|
               portcount += 1
               sge = Gv.graph(sgd, "cluster#{portcount}")
               Gv.setv(sge, 'color', 'black')
@@ -242,7 +240,7 @@ class ProcessList
   end
   # end graph_processes
 
-  def graph_connections(gv, out_file, con_type)
+  def graph_connections(mygraph, out_file, con_type)
     line_array = []
     start_end = {}
     # con_type = 0 # port [T]
@@ -325,22 +323,19 @@ class ProcessList
 
     # now just plot out the array of connections
     line_array.uniq!
-    line_array.each do |start_end|
+    line_array.each do |startend|
       count += 1
-      start_node = start_end['start']
-      end_node = start_end['end']
+      start_node = startend['start']
+      end_node = startend['end']
       colorcode = count.modulo(colors.size)
-      eg = Gv.edge(gv, start_node, end_node)
+      eg = Gv.edge(mygraph, start_node, end_node)
       # connect the dots
       Gv.setv(eg, 'color', colors[colorcode])
     end
-    Gv.write(gv, "#{outputfile}.dot")
+    Gv.write(mygraph, "#{outputfile}.dot")
     # for now, create the dot this way, see if we can find correction
-    results = `dot -Tpng #{outputfile}.dot -o #{outputfile}.png 2> /dev/null`
-    if $?.success?
-    else
-      warn 'dot command failed'
-    end
+    `dot -Tpng #{outputfile}.dot -o #{outputfile}.png 2> /dev/null`
+    warn 'dot command failed' unless $?.success?
   end # graph_connections
 end # ProcessList
 
@@ -437,10 +432,10 @@ class IPAddr
   def add_proc(proc_to_add)
     found = false
     unless @proc_list.empty?
-      @proc_list.each do |_proc|
-        if _proc.proc_name == proc_to_add
+      @proc_list.each do |theproc|
+        if theproc.proc_name == proc_to_add
           found = true
-          return _proc
+          return theproc
         end
         # match
       end
@@ -458,9 +453,9 @@ class IPAddr
   # add_proc
 
   def print_proc_list
-    @proc_list.each do |_proc|
-      $stdout.puts "proc is #{_proc.proc_name}"
-      _proc.print_ports
+    @proc_list.each do |theproc|
+      $stdout.puts "proc is #{theproc.proc_name}"
+      theproc.print_ports
     end
     # Proc
   end
@@ -541,7 +536,7 @@ end
 # PortNum
 
 def file_input(inputfile, outputfile, filetype, site_name)
-  @all_comms = Array.new { {} }
+  @all_comms = Array.new []
   infiles = []
   @inputfile = inputfile
   @outputfile = outputfile
@@ -612,7 +607,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           state = f1[1]
           rec_q = f1[2]
           cancel = true if rec_q == 'Recv-Q'
-          ### judy is swapping the local and remote addresses if state is LISTEN or UNCONN 5/22/17
+          # swap the local and remote addresses if state is LISTEN or UNCONN
           if state == 'LISTEN' || state == 'UNCONN'
             local_add = f1[5] # BACK
             peer_add = f1[4]
@@ -648,17 +643,17 @@ def file_input(inputfile, outputfile, filetype, site_name)
           proc_user = `ps --no-header -o user #{the_pid}`.strip
         rescue StandardError
           # ignore everything else
-          # puts "error parsing #{infile} - badly formatted raw file, ignoring line #{line}"
+          # puts "error parsing raw file #{infile}, ignoring line #{line}"
         end
 
         # current domain and host
         if f1.size < 7
-          # puts "not enough fields #{infile} - badly formatted raw file, ignoring line #{line}"
+          # puts "not enough fields raw file #{infile}, ignoring line #{line}"
         end
         # current site and host
         site_name = @site_name
 
-        # judy - get hostname from filename i we didnt just run the ss command
+        # get hostname from filename if we didnt just run the ss command
         if new_ss
           hostname = Socket.gethostname.to_s
         else
@@ -668,7 +663,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
 
         # if it is a browser, we do not need all the gory details
         peer_proc = ''
-        if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
+        if %w(firefox chrome browser).include?(proc_name)
           proc_name = 'browser'
           local_port = 'local'
           peer_ip = 'www'
@@ -723,7 +718,6 @@ def file_input(inputfile, outputfile, filetype, site_name)
 
         begin
           f1 = line.split(',').map(&:strip)
-          # judy sitename fix site_name = f1[0]
           hostname = f1[1]
           domainname = f1[2]
           local_ip = f1[3]
@@ -745,7 +739,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           # puts "#{infile} not enough fields - ignoring\n #{line}"
         else
           # if you are on the www, let's fix this now
-          if proc_name == 'firefox' || proc_name == 'chrome' || proc_name == 'browser'
+          if %w(firefox chrome browser).include?(proc_name)
             proc_name = 'browser'
             local_port = 'local'
             peer_ip = 'www'
@@ -753,7 +747,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
             peer_proc = 'browser'
           end
 
-          # judy fix this to get the correct hostname
+          # fix this to get the correct hostname
           # if brand new figure it out, if not, use the filename
           if new_ss
             hostname = Socket.gethostname.to_s
@@ -777,7 +771,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
                                    proc_user
                                  else
                                    ''
-                               end
+                                 end
           datarow['process_name'] = proc_name
           datarow['process_user'] = proc_user
           datarow['peer_ip'] = peer_ip
