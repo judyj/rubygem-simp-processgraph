@@ -155,8 +155,11 @@ class ProcessList
     # rank LR draws left to right which is easier to read
     Gv.layout(mygraph, 'dot')
     Gv.setv(mygraph, 'rankdir', 'LR')
-    Gv.setv(mygraph, 'splines', 'true')
-    Gv.setv(mygraph, 'strict', 'true')
+#    Gv.setv(mygraph, 'splines', 'true')
+#    Gv.setv(mygraph, 'strict', 'true')
+    Gv.setv(mygraph, 'splines', 'polyline')
+    Gv.setv(mygraph, 'concentrate', 'true')
+    Gv.setv(mygraph,'ranksep','10.0')
     upno = 0
     sitecount = 0
     hostcount = 0
