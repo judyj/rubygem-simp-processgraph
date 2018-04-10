@@ -12,4 +12,7 @@ gem 'rake'
 group :system_tests do
   gem 'pry'
   gem 'rspec'
+
+  # Ruby code coverage
+  gem 'simplecov'
 end
