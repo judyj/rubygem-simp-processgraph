@@ -10,7 +10,6 @@ require 'fileutils'
 site_name = 'test_domain'
 # test port function
 describe 'testing default to port' do
-  con_type = 0
   file_name = 'port'
   # create a temp dir for output
   outdir = File.join('processgraph_output', site_name)
@@ -18,6 +17,8 @@ describe 'testing default to port' do
   # create graph of ports
   Dir.chdir(outdir) do
     the_graph = ProcessList.new(nil, file_name, false)
+    con_type = the_graph.instance_variable_get(:@port_conn)
+puts ("con_type is #{con_type}")
     the_graph.process_data(site_name, con_type)
   end
   # make sure you get a dotfile
@@ -31,7 +32,6 @@ describe 'testing default to port' do
 end
 # change to do process graph
 describe 'testing default to process' do
-  con_type = 1
   file_name = 'process'
   # create a temp dir for output
   outdir = File.join('processgraph_output', site_name)
@@ -39,6 +39,7 @@ describe 'testing default to process' do
   # create the graph
   Dir.chdir(outdir) do
     the_graph = ProcessList.new(nil, file_name)
+    con_type = the_graph.instance_variable_get(:@proc_conn)
     the_graph.process_data(site_name, con_type)
   end
   # ensure a dot file
@@ -52,14 +53,14 @@ describe 'testing default to process' do
 end
 # change to do ip graph
 describe 'testing default to ip' do
-  con_type = 2
-  file_name = 'ip'
+  file_name = "ip"
   # create a temp dir for output
   outdir = File.join('processgraph_output', site_name)
   FileUtils.mkdir_p(outdir) unless File.directory?(outdir)
   # create the graph
   Dir.chdir(outdir) do
     the_graph = ProcessList.new(nil, file_name)
+    con_type = the_graph.instance_variable_get(:@ip_conn)
     the_graph.process_data(site_name, con_type)
   end
   # .. and dot file

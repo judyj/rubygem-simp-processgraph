@@ -34,6 +34,10 @@ class ProcessList
     @out_file = out_file
     @raw = raw
     @site_list = []
+    @ip_conn = 2
+    @proc_conn = 1
+    @port_conn = 0
+
   end
 
   # Process array from file
@@ -198,7 +202,7 @@ class ProcessList
           Gv.setv(nga, 'width', '0.01')
           ip.graph_node = "k#{upno}"
           upno += 1
-          next unless con_type < 2
+          next unless con_type < @ip_conn
           ip.proc_list.each do |theproc|
             proccount += 1
             sgd = Gv.graph(sgc, "cluster#{proccount}")
@@ -213,7 +217,7 @@ class ProcessList
             Gv.setv(ngb, 'width', '0.01')
             theproc.graph_node = "k#{upno}"
             upno += 1
-            next unless con_type < 1
+            next unless con_type < @proc_conn
             theproc.port_list.each do |portno|
               portcount += 1
               sge = Gv.graph(sgd, "cluster#{portcount}")
@@ -246,9 +250,6 @@ class ProcessList
   def graph_connections(mygraph, out_file, con_type)
     line_array = []
     start_end = {}
-    # con_type = 0 # port [T]
-    # con_type = 1 # process [R]
-    # con_type = 2 # ip [I]
     colors = Array['yellow', 'green', 'orange', 'violet',
                    'turquoise', 'gray', 'brown']
     count = 0
@@ -264,7 +265,7 @@ class ProcessList
         ip_list = host.ip_list
         ip_list.each do |ip|
           # ip connections
-          if con_type == 2
+          if con_type == @ip_conn
             ip.connections_i.each do |conn|
               start_node = ip.graph_node
               end_node = conn.graph_node
@@ -282,7 +283,7 @@ class ProcessList
           proc_list = ip.proc_list
           proc_list.each do |myproc|
             # processes
-            if con_type == 1
+            if con_type == @proc_conn
               myproc.connections_r.each do |conn|
                 start_node = myproc.graph_node
                 end_node = conn.graph_node
@@ -298,7 +299,7 @@ class ProcessList
             # end if process connections
 
             port_list = myproc.port_list
-            next unless con_type == 0
+            next unless con_type == @port_conn
             # port connections
             port_list.each do |portnum|
               portnum.connections_t.each do |conn|

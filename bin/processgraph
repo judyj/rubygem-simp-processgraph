@@ -12,7 +12,11 @@ raw = false
 outfile = nil
 site_name = nil
 con_type = 0
-debug = false
+$debug = false
+
+port_con_type = 0 # port [T]
+proc_con_type = 1 # process [R]
+ip_con_type = 2 # ip [I]
 
 optsparse = OptionParser.new do |opts|
   opts.banner = 'Usage: processgraph -s sitename [options]'
@@ -38,17 +42,13 @@ optsparse = OptionParser.new do |opts|
   end
   outmsg = 'Connection type (T = Port, R = Process, I = IP)'
   opts.on('-c', '--connection NAME', outmsg) do |c|
-    #    puts "connection is #{c}"
-    #  con_type = 0 # port [T]
-    #  con_type = 1 # process [R]
-    #  con_type = 2 # ip [I]
     case c
     when 'I', 'i'
-      con_type = 2
+      con_type = ip_con_type
     when 'R', 'r'
-      con_type = 1
+      con_type = proc_con_type
     when 'T', 't'
-      con_type = 0
+      con_type = port_con_type
     else
       puts 'Invalid connection type'
       puts "graph level option is #{con_type}"
@@ -58,7 +58,7 @@ optsparse = OptionParser.new do |opts|
   # connection option
   msg = 'File name root (directory is predetermined)'
   opts.on('-o', '--output FILENAME', msg) do |o|
-    puts "output filename is #{o}" if debug
+    puts "output filename is #{o}" if $debug
     outfile = o.strip
   end
 end

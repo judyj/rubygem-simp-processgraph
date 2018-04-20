@@ -7,12 +7,12 @@ require_relative 'spec_helper'
 require 'fileutils'
 
 site_name = 'test_domain'
-con_type = 0
+# con_type = 0
 home_dir = File.expand_path('~')
 test_dir = home_dir + '/ssfiles'
 sample_file = 'spec/fixtures/sample.ss'
 unless File.directory?(test_dir)
-  puts "created directory, copied in #{sample_file}"
+  stderr.puts "created directory, copied in #{sample_file}"
   FileUtils.mkdir(test_dir)
 end
 FileUtils.cp(sample_file, test_dir)
@@ -24,6 +24,7 @@ describe 'testing input directory to process graph' do
 
   Dir.chdir(outdir) do
     the_graph = ProcessList.new(test_dir, 'testdir', false)
+    con_type = the_graph.instance_variable_get(:@port_conn)
     the_graph.process_data(site_name, con_type)
   end
   # create dot file
