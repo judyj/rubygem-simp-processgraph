@@ -37,7 +37,6 @@ class ProcessList
     @ip_conn = 2
     @proc_conn = 1
     @port_conn = 0
-
   end
 
   # Process array from file
@@ -612,7 +611,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           rec_q = f1[2]
           cancel = true if rec_q == 'Recv-Q'
           # swap the local and remote addresses if state is LISTEN or UNCONN
-          if state == 'LISTEN' || state == 'UNCONN'
+          if ['LISTEN','UNCONN'].include?state
             local_add = f1[5] # BACK
             peer_add = f1[4]
           else
