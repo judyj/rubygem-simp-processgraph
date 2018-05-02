@@ -143,10 +143,11 @@ class ProcessList
     end
   end
 
-  def print_sites
+  def print_sites(input_file)
+    dbg_file = File.open(input_file, "w")
     @site_list.each do |site|
-      $stdout.puts "site name is #{site.site_name}"
-      site.print_hosts
+      dbg_file.puts "site name is #{site.site_name}"
+      site.print_hosts(dbg_file)
     end
     # end site
   end
@@ -158,8 +159,6 @@ class ProcessList
     # rank LR draws left to right which is easier to read
     Gv.layout(mygraph, 'dot')
     Gv.setv(mygraph, 'rankdir', 'LR')
-#    Gv.setv(mygraph, 'splines', 'true')
-#    Gv.setv(mygraph, 'strict', 'true')
     Gv.setv(mygraph, 'splines', 'polyline')
     Gv.setv(mygraph, 'concentrate', 'true')
     Gv.setv(mygraph,'ranksep','10.0')
@@ -373,10 +372,10 @@ class SiteName
     end
   end
 
-  def print_hosts
+  def print_hosts(dbg_file)
     @host_list.each do |hostnm|
-      $stdout.puts "hostname is #{hostnm.hostname}"
-      hostnm.print_ips
+      dbg_file.puts "hostname is #{hostnm.hostname}"
+      hostnm.print_ips(dbg_file)
     end
     # site
   end
@@ -411,10 +410,10 @@ class HostName
     end # found
   end # add_ip
 
-  def print_ips
+  def print_ips(dbg_file)
     @ip_list.each do |ipnm|
-      $stdout.puts "ip is #{ipnm.ip}"
-      ipnm.print_proc_list
+      dbg_file.puts "ip is #{ipnm.ip}"
+      ipnm.print_proc_list(dbg_file)
     end # IP
   end # print_ips
 end # HostName
@@ -455,10 +454,10 @@ class IPAddr
   end
   # add_proc
 
-  def print_proc_list
+  def print_proc_list(dbg_file)
     @proc_list.each do |theproc|
-      $stdout.puts "proc is #{theproc.proc_name}"
-      theproc.print_ports
+      dbg_file.puts "proc is #{theproc.proc_name}"
+      theproc.print_ports(dbg_file)
     end
     # Proc
   end
@@ -506,9 +505,9 @@ class ProcessName
   end
   # add_port
 
-  def print_ports
+  def print_ports(dbg_file)
     @port_list.each do |port|
-      $stdout.puts "port is #{port.port}"
+      dbg_file.puts "port is #{port.port}"
     end
     # ports
   end
@@ -651,7 +650,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
 
         # current domain and host
         if f1.size < 7
-          # puts "not enough fields raw file #{infile}, ignoring line #{line}"
+          # $stdout.puts "not enough fields raw file #{infile}, ignoring line #{line}" # jjjjjjjjjjjjjjjjjj
         end
         # current site and host
         site_name = @site_name
@@ -734,7 +733,7 @@ def file_input(inputfile, outputfile, filetype, site_name)
           peer_proc = ''
         rescue StandardError
           # ignore everything else
-          # puts "error parsing #{infile} - ignoring\n #{line}"
+          # $stdout.puts "error parsing #{infile} - ignoring\n #{line}"
         end
         # current domain and host
 
@@ -799,7 +798,7 @@ end
 # Print array from file
 def print_array(all_comms, input_file)
   out_file = "#{input_file}.ss"
-  out_file = File.open(out_file, 'w')
+  out_file = File.open(out_file, "w")
   all_comms.each do |record|
     out_file.puts "#{record['site_name']},#{record['hostname']},
     #{record['domainname']},#{record['local_ip']},#{record['local_port']},
